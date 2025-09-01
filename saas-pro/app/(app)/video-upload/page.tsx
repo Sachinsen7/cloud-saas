@@ -10,10 +10,12 @@ export default function Video() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const router = useRouter();
 
-  const MAX_FILE_SIZE = 70 * 1024 * 1024; // 10 MB in bytes
+  const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -34,11 +36,21 @@ export default function Video() {
     formData.append("originalSize", file.size.toString());
 
     try {
-      const response = await axios.post("/api/video-upload", formData);
+      setError(null);
+      setSuccess(null);
+      const response = await axios.post("/api/video-upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       console.log("Video uploaded successfully:", response.data);
-      router.push("/videos");
-    } catch (error) {
+      setSuccess("Video uploaded successfully! Redirecting...");
+      setTimeout(() => {
+        router.push("/videos");
+      }, 1500);
+    } catch (error: any) {
       console.error("Error uploading video:", error);
+      setError(
+        error.response?.data || error.message || "Failed to upload video"
+      );
     } finally {
       setIsUploading(false);
     }
@@ -46,6 +58,45 @@ export default function Video() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Upload Video</h1>
+
+      {error && (
+        <div className="alert alert-error mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
+
+      {success && (
+        <div className="alert alert-success mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{success}</span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="label">
@@ -81,13 +132,18 @@ export default function Video() {
             required
           />
         </div>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isUploading}
-        >
-          {isUploading ? "Uploading..." : "Upload Video"}
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isUploading}
+          >
+            {isUploading ? "Uploading..." : "Upload Video"}
+          </button>
+          <a href="/videos" className="btn btn-outline">
+            View All Videos
+          </a>
+        </div>
       </form>
     </div>
   );
