@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import VideoCard from "@/components/VideoCard";
-import { Video } from "@/types";
+import { Video } from "@/generated/prisma";
 
 const Home = () => {
   const [videos, setVideos] = useState<Video[]>([]);
