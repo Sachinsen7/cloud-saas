@@ -9,8 +9,18 @@ import { Video } from "@/generated/prisma";
 dayjs.extend(relativeTime);
 
 interface VideoCardProps {
-  video: Video;
-  onDownload: (url: string, title: string) => void;
+  video: {
+    id: string;
+    title: string;
+    description: string | null;
+    publicId: string;
+    originalSize: string;
+    compressedSize: string;
+    duration: number;
+    createdAt: Date | string;
+    updatedAt: Date | string;
+  };
+  onDownload?: (url: string, title: string) => void;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
@@ -43,7 +53,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
       src: publicId,
       width: 400,
       height: 225,
-      rawTransformations: ["e_preview: duration_15:max_seg_9:min_seg_dur_1"],
+      quality: "auto",
     });
   }, []);
 
@@ -108,7 +118,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           {video.description}
         </p>
         <p className="text-sm text-base-content opacity-70 mb-4">
-          Uploaded {dayjs(video.createdAt).fromNow()}
+          Uploaded {dayjs(video.createdAt as string).fromNow()}
         </p>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center">
@@ -133,7 +143,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           </div>
           <button
             className="btn btn-primary btn-sm"
-            onClick={() => onDownload(getVideoUrl(video.publicId), video.title)}
+            onClick={() => {
+              if (onDownload) {
+                onDownload(getVideoUrl(video.publicId), video.title);
+              } else {
+                const link = document.createElement("a");
+                link.href = getVideoUrl(video.publicId);
+                link.download = `${video.title}.mp4`;
+                link.click();
+              }
+            }}
           >
             <Download size={16} />
           </button>
