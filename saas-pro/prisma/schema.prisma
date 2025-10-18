@@ -25,3 +25,44 @@ model Video {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Image {
+  id String @id @default(cuid())
+  title String
+  description String?
+  publicId String
+  originalSize String
+  fileType String
+  tags String[] // Auto-generated tags from AI
+  extractedText String? // OCR extracted text
+  hasBackgroundRemoved Boolean @default(false)
+  isEnhanced Boolean @default(false)
+  // AI Content Analysis fields
+  aiCaption String? // AI-generated caption
+  qualityScore Float? // Image quality score (0-1)
+  qualityLevel String? // low, medium, high
+  watermarkDetected String? // clean, banner, watermark
+  objectDetection Json? // Detected objects with bounding boxes
+  // AI Vision fields
+  aiVisionTags Json? // Custom AI Vision tags
+  aiVisionModeration Json? // Moderation responses
+  aiVisionGeneral Json? // General AI responses
+  tokensUsed Int? // Tokens consumed for AI Vision
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id String @id @default(cuid())
+  title String
+  description String?
+  originalPublicId String // Original document (Word, Excel, etc.)
+  pdfPublicId String? // Converted PDF version
+  thumbnailPublicId String? // Thumbnail image
+  originalSize String
+  fileType String // docx, xlsx, pptx, etc.
+  conversionStatus String @default("pending") // pending, complete, failed
+  pageCount Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
