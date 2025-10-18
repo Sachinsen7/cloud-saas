@@ -1,0 +1,25 @@
+# Ignore node modules
+node_modules/
+
+# Build and dist folders
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+
+# Ignore lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Ignore config and log files
+*.log
+
+# Ignore compiled files
+*.min.js
+*.min.css
+
+# Ignore git-related folders
+.git/
