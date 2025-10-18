@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { CldImage } from "next-cloudinary";
+import React, { useState, useEffect } from 'react';
+import { CldImage } from 'next-cloudinary';
 import {
     Download,
     Eye,
@@ -10,8 +10,8 @@ import {
     Tag,
     FileText,
     Scissors,
-    Sparkles
-} from "lucide-react";
+    Sparkles,
+} from 'lucide-react';
 
 interface AIImage {
     id: string;
@@ -29,7 +29,7 @@ export default function AIGallery() {
     const [images, setImages] = useState<AIImage[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState<AIImage | null>(null);
-    const [filter, setFilter] = useState<string>("all");
+    const [filter, setFilter] = useState<string>('all');
 
     useEffect(() => {
         fetchImages();
@@ -37,50 +37,50 @@ export default function AIGallery() {
 
     const fetchImages = async () => {
         try {
-            const response = await fetch("/api/ai-images");
+            const response = await fetch('/api/ai-images');
             if (response.ok) {
                 const data = await response.json();
                 setImages(data);
             }
         } catch (error) {
-            console.error("Error fetching images:", error);
+            console.error('Error fetching images:', error);
         } finally {
             setLoading(false);
         }
     };
 
     const deleteImage = async (imageId: string) => {
-        if (!confirm("Are you sure you want to delete this image?")) return;
+        if (!confirm('Are you sure you want to delete this image?')) return;
 
         try {
             const response = await fetch(`/api/ai-images?id=${imageId}`, {
-                method: "DELETE",
+                method: 'DELETE',
             });
 
             if (response.ok) {
-                setImages(images.filter(img => img.id !== imageId));
+                setImages(images.filter((img) => img.id !== imageId));
                 setSelectedImage(null);
             }
         } catch (error) {
-            console.error("Error deleting image:", error);
+            console.error('Error deleting image:', error);
         }
     };
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        alert("Copied to clipboard!");
+        alert('Copied to clipboard!');
     };
 
     const getFilteredImages = () => {
         switch (filter) {
-            case "background-removed":
-                return images.filter(img => img.hasBackgroundRemoved);
-            case "enhanced":
-                return images.filter(img => img.isEnhanced);
-            case "with-text":
-                return images.filter(img => img.extractedText);
-            case "tagged":
-                return images.filter(img => img.tags.length > 0);
+            case 'background-removed':
+                return images.filter((img) => img.hasBackgroundRemoved);
+            case 'enhanced':
+                return images.filter((img) => img.isEnhanced);
+            case 'with-text':
+                return images.filter((img) => img.extractedText);
+            case 'tagged':
+                return images.filter((img) => img.tags.length > 0);
             default:
                 return images;
         }
@@ -110,35 +110,35 @@ export default function AIGallery() {
             {/* Filters */}
             <div className="flex flex-wrap gap-2 mb-6">
                 <button
-                    className={`btn btn-sm ${filter === "all" ? "btn-primary" : "btn-outline"}`}
-                    onClick={() => setFilter("all")}
+                    className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setFilter('all')}
                 >
                     All Images ({images.length})
                 </button>
                 <button
-                    className={`btn btn-sm ${filter === "background-removed" ? "btn-primary" : "btn-outline"}`}
-                    onClick={() => setFilter("background-removed")}
+                    className={`btn btn-sm ${filter === 'background-removed' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setFilter('background-removed')}
                 >
                     <Scissors className="w-4 h-4" />
                     Background Removed
                 </button>
                 <button
-                    className={`btn btn-sm ${filter === "enhanced" ? "btn-primary" : "btn-outline"}`}
-                    onClick={() => setFilter("enhanced")}
+                    className={`btn btn-sm ${filter === 'enhanced' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setFilter('enhanced')}
                 >
                     <Sparkles className="w-4 h-4" />
                     Enhanced
                 </button>
                 <button
-                    className={`btn btn-sm ${filter === "with-text" ? "btn-primary" : "btn-outline"}`}
-                    onClick={() => setFilter("with-text")}
+                    className={`btn btn-sm ${filter === 'with-text' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setFilter('with-text')}
                 >
                     <FileText className="w-4 h-4" />
                     With Text
                 </button>
                 <button
-                    className={`btn btn-sm ${filter === "tagged" ? "btn-primary" : "btn-outline"}`}
-                    onClick={() => setFilter("tagged")}
+                    className={`btn btn-sm ${filter === 'tagged' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setFilter('tagged')}
                 >
                     <Tag className="w-4 h-4" />
                     Tagged
@@ -157,7 +157,10 @@ export default function AIGallery() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredImages.map((image) => (
-                        <div key={image.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all">
+                        <div
+                            key={image.id}
+                            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all"
+                        >
                             <figure className="aspect-square relative">
                                 <CldImage
                                     width={300}
@@ -204,15 +207,22 @@ export default function AIGallery() {
                             </figure>
 
                             <div className="card-body p-4">
-                                <h2 className="card-title text-sm">{image.title}</h2>
+                                <h2 className="card-title text-sm">
+                                    {image.title}
+                                </h2>
 
                                 {image.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-2">
-                                        {image.tags.slice(0, 3).map((tag, index) => (
-                                            <span key={index} className="badge badge-outline badge-xs">
-                                                {tag}
-                                            </span>
-                                        ))}
+                                        {image.tags
+                                            .slice(0, 3)
+                                            .map((tag, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="badge badge-outline badge-xs"
+                                                >
+                                                    {tag}
+                                                </span>
+                                            ))}
                                         {image.tags.length > 3 && (
                                             <span className="badge badge-outline badge-xs">
                                                 +{image.tags.length - 3}
@@ -225,7 +235,8 @@ export default function AIGallery() {
                                     <button
                                         className="btn btn-sm btn-primary"
                                         onClick={() => {
-                                            const link = document.createElement('a');
+                                            const link =
+                                                document.createElement('a');
                                             link.href = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${image.publicId}`;
                                             link.download = `${image.title}.jpg`;
                                             link.click();
@@ -244,7 +255,9 @@ export default function AIGallery() {
             {selectedImage && (
                 <div className="modal modal-open">
                     <div className="modal-box max-w-4xl">
-                        <h3 className="font-bold text-lg mb-4">{selectedImage.title}</h3>
+                        <h3 className="font-bold text-lg mb-4">
+                            {selectedImage.title}
+                        </h3>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Image */}
@@ -262,32 +275,51 @@ export default function AIGallery() {
                             <div className="space-y-4">
                                 {selectedImage.description && (
                                     <div>
-                                        <h4 className="font-semibold">Description:</h4>
-                                        <p className="text-sm">{selectedImage.description}</p>
+                                        <h4 className="font-semibold">
+                                            Description:
+                                        </h4>
+                                        <p className="text-sm">
+                                            {selectedImage.description}
+                                        </p>
                                     </div>
                                 )}
 
                                 {selectedImage.tags.length > 0 && (
                                     <div>
-                                        <h4 className="font-semibold">AI Tags:</h4>
+                                        <h4 className="font-semibold">
+                                            AI Tags:
+                                        </h4>
                                         <div className="flex flex-wrap gap-2 mt-2">
-                                            {selectedImage.tags.map((tag, index) => (
-                                                <span key={index} className="badge badge-primary">
-                                                    {tag}
-                                                </span>
-                                            ))}
+                                            {selectedImage.tags.map(
+                                                (tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="badge badge-primary"
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                )
+                                            )}
                                         </div>
                                     </div>
                                 )}
 
                                 {selectedImage.extractedText && (
                                     <div>
-                                        <h4 className="font-semibold">Extracted Text:</h4>
+                                        <h4 className="font-semibold">
+                                            Extracted Text:
+                                        </h4>
                                         <div className="bg-gray-50 p-3 rounded-lg mt-2">
-                                            <p className="text-sm whitespace-pre-wrap">{selectedImage.extractedText}</p>
+                                            <p className="text-sm whitespace-pre-wrap">
+                                                {selectedImage.extractedText}
+                                            </p>
                                             <button
                                                 className="btn btn-sm btn-outline mt-2"
-                                                onClick={() => copyToClipboard(selectedImage.extractedText!)}
+                                                onClick={() =>
+                                                    copyToClipboard(
+                                                        selectedImage.extractedText!
+                                                    )
+                                                }
                                             >
                                                 <Copy className="w-4 h-4" />
                                                 Copy Text
@@ -297,19 +329,29 @@ export default function AIGallery() {
                                 )}
 
                                 <div>
-                                    <h4 className="font-semibold">Processing Applied:</h4>
+                                    <h4 className="font-semibold">
+                                        Processing Applied:
+                                    </h4>
                                     <div className="flex flex-wrap gap-2 mt-2">
                                         {selectedImage.hasBackgroundRemoved && (
-                                            <span className="badge badge-error">Background Removed</span>
+                                            <span className="badge badge-error">
+                                                Background Removed
+                                            </span>
                                         )}
                                         {selectedImage.isEnhanced && (
-                                            <span className="badge badge-secondary">Enhanced</span>
+                                            <span className="badge badge-secondary">
+                                                Enhanced
+                                            </span>
                                         )}
                                         {selectedImage.extractedText && (
-                                            <span className="badge badge-info">OCR Processed</span>
+                                            <span className="badge badge-info">
+                                                OCR Processed
+                                            </span>
                                         )}
                                         {selectedImage.tags.length > 0 && (
-                                            <span className="badge badge-success">Auto Tagged</span>
+                                            <span className="badge badge-success">
+                                                Auto Tagged
+                                            </span>
                                         )}
                                     </div>
                                 </div>
@@ -329,7 +371,10 @@ export default function AIGallery() {
                                 <Download className="w-4 h-4" />
                                 Download
                             </button>
-                            <button className="btn" onClick={() => setSelectedImage(null)}>
+                            <button
+                                className="btn"
+                                onClick={() => setSelectedImage(null)}
+                            >
                                 Close
                             </button>
                         </div>
