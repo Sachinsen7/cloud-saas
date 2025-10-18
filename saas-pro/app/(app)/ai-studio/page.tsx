@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { CldImage } from "next-cloudinary";
+import React, { useState } from 'react';
+import { CldImage } from 'next-cloudinary';
 import {
     Wand2,
     Scissors,
@@ -11,8 +11,8 @@ import {
     Upload,
     Download,
     Copy,
-    Eye
-} from "lucide-react";
+    Eye,
+} from 'lucide-react';
 
 interface ProcessedImage {
     id: string;
@@ -95,12 +95,15 @@ const AI_FEATURES = [
 ];
 
 export default function AIStudio() {
-    const [selectedFeature, setSelectedFeature] = useState<string>('background-removal');
+    const [selectedFeature, setSelectedFeature] =
+        useState<string>('background-removal');
     const [file, setFile] = useState<File | null>(null);
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
-    const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(null);
+    const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(
+        null
+    );
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,43 +112,41 @@ export default function AIStudio() {
             setFile(selectedFile);
             setTitle(selectedFile.name.split('.')[0]);
 
-            // Create preview URL
             const url = URL.createObjectURL(selectedFile);
             setPreviewUrl(url);
 
-            // Reset previous results
             setProcessedImage(null);
         }
     };
 
     const handleProcess = async () => {
         if (!file) {
-            alert("Please select a file first");
+            alert('Please select a file first');
             return;
         }
 
         setIsProcessing(true);
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("processType", selectedFeature);
+        formData.append('file', file);
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('processType', selectedFeature);
 
         try {
-            const response = await fetch("/api/ai-image-process", {
-                method: "POST",
+            const response = await fetch('/api/ai-image-process', {
+                method: 'POST',
                 body: formData,
             });
 
             if (!response.ok) {
-                throw new Error("Failed to process image");
+                throw new Error('Failed to process image');
             }
 
             const result = await response.json();
             setProcessedImage(result);
         } catch (error) {
-            console.error("Error processing image:", error);
-            alert("Failed to process image. Please try again.");
+            console.error('Error processing image:', error);
+            alert('Failed to process image. Please try again.');
         } finally {
             setIsProcessing(false);
         }
@@ -153,7 +154,7 @@ export default function AIStudio() {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        alert("Copied to clipboard!");
+        alert('Copied to clipboard!');
     };
 
     const downloadProcessedImage = () => {
@@ -165,7 +166,9 @@ export default function AIStudio() {
         }
     };
 
-    const selectedFeatureData = AI_FEATURES.find(f => f.id === selectedFeature);
+    const selectedFeatureData = AI_FEATURES.find(
+        (f) => f.id === selectedFeature
+    );
 
     return (
         <div className="container mx-auto p-4 max-w-6xl">
@@ -185,27 +188,34 @@ export default function AIStudio() {
                     return (
                         <div
                             key={feature.id}
-                            className={`card cursor-pointer transition-all duration-200 ${selectedFeature === feature.id
-                                ? 'ring-2 ring-primary shadow-lg'
-                                : 'hover:shadow-md'
-                                }`}
+                            className={`card cursor-pointer transition-all duration-200 ${
+                                selectedFeature === feature.id
+                                    ? 'ring-2 ring-primary shadow-lg'
+                                    : 'hover:shadow-md'
+                            }`}
                             onClick={() => setSelectedFeature(feature.id)}
                         >
                             <div className="card-body p-4 text-center">
-                                <div className={`mx-auto w-12 h-12 rounded-full ${feature.bgColor} flex items-center justify-center mb-3`}>
-                                    <Icon className={`w-6 h-6 ${feature.color}`} />
+                                <div
+                                    className={`mx-auto w-12 h-12 rounded-full ${feature.bgColor} flex items-center justify-center mb-3`}
+                                >
+                                    <Icon
+                                        className={`w-6 h-6 ${feature.color}`}
+                                    />
                                 </div>
-                                <h3 className="font-semibold text-sm">{feature.name}</h3>
-                                <p className="text-xs text-gray-500 mt-1">{feature.description}</p>
+                                <h3 className="font-semibold text-sm">
+                                    {feature.name}
+                                </h3>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    {feature.description}
+                                </p>
                             </div>
                         </div>
                     );
                 })}
             </div>
 
-            {/* Main Processing Area */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Upload Section */}
                 <div className="card bg-base-100 shadow-xl">
                     <div className="card-body">
                         <h2 className="card-title flex items-center gap-2">
@@ -240,7 +250,9 @@ export default function AIStudio() {
 
                         <div className="form-control">
                             <label className="label">
-                                <span className="label-text">Description (Optional)</span>
+                                <span className="label-text">
+                                    Description (Optional)
+                                </span>
                             </label>
                             <textarea
                                 value={description}
@@ -256,8 +268,12 @@ export default function AIStudio() {
                                 <div className="flex items-center gap-2">
                                     <selectedFeatureData.icon className="w-5 h-5" />
                                     <div>
-                                        <h4 className="font-semibold">{selectedFeatureData.name}</h4>
-                                        <p className="text-sm">{selectedFeatureData.description}</p>
+                                        <h4 className="font-semibold">
+                                            {selectedFeatureData.name}
+                                        </h4>
+                                        <p className="text-sm">
+                                            {selectedFeatureData.description}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -285,7 +301,6 @@ export default function AIStudio() {
                     </div>
                 </div>
 
-                {/* Preview & Results Section */}
                 <div className="card bg-base-100 shadow-xl">
                     <div className="card-body">
                         <h2 className="card-title flex items-center gap-2">
@@ -295,7 +310,9 @@ export default function AIStudio() {
 
                         {previewUrl && (
                             <div className="mb-4">
-                                <h3 className="font-semibold mb-2">Original Image:</h3>
+                                <h3 className="font-semibold mb-2">
+                                    Original Image:
+                                </h3>
                                 <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                                     <img
                                         src={previewUrl}
@@ -311,10 +328,14 @@ export default function AIStudio() {
                                 {/* Processed Image */}
                                 {processedImage.processedUrl && (
                                     <div>
-                                        <h3 className="font-semibold mb-2">Processed Image:</h3>
+                                        <h3 className="font-semibold mb-2">
+                                            Processed Image:
+                                        </h3>
                                         <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                                             <img
-                                                src={processedImage.processedUrl}
+                                                src={
+                                                    processedImage.processedUrl
+                                                }
                                                 alt="Processed"
                                                 className="w-full h-full object-contain"
                                             />
@@ -332,12 +353,20 @@ export default function AIStudio() {
                                 {/* OCR Results */}
                                 {processedImage.extractedText && (
                                     <div>
-                                        <h3 className="font-semibold mb-2">Extracted Text:</h3>
+                                        <h3 className="font-semibold mb-2">
+                                            Extracted Text:
+                                        </h3>
                                         <div className="bg-gray-50 p-4 rounded-lg">
-                                            <p className="text-sm whitespace-pre-wrap">{processedImage.extractedText}</p>
+                                            <p className="text-sm whitespace-pre-wrap">
+                                                {processedImage.extractedText}
+                                            </p>
                                             <button
                                                 className="btn btn-sm btn-outline mt-2"
-                                                onClick={() => copyToClipboard(processedImage.extractedText!)}
+                                                onClick={() =>
+                                                    copyToClipboard(
+                                                        processedImage.extractedText!
+                                                    )
+                                                }
                                             >
                                                 <Copy className="w-4 h-4" />
                                                 Copy Text
@@ -347,22 +376,32 @@ export default function AIStudio() {
                                 )}
 
                                 {/* Tags */}
-                                {processedImage.tags && processedImage.tags.length > 0 && (
-                                    <div>
-                                        <h3 className="font-semibold mb-2">AI Tags:</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {processedImage.tags.map((tag, index) => (
-                                                <span key={index} className="badge badge-primary badge-sm">
-                                                    {tag}
-                                                </span>
-                                            ))}
+                                {processedImage.tags &&
+                                    processedImage.tags.length > 0 && (
+                                        <div>
+                                            <h3 className="font-semibold mb-2">
+                                                AI Tags:
+                                            </h3>
+                                            <div className="flex flex-wrap gap-2">
+                                                {processedImage.tags.map(
+                                                    (tag, index) => (
+                                                        <span
+                                                            key={index}
+                                                            className="badge badge-primary badge-sm"
+                                                        >
+                                                            {tag}
+                                                        </span>
+                                                    )
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 {/* Success Message */}
                                 <div className="alert alert-success">
-                                    <span>✅ Image processed successfully!</span>
+                                    <span>
+                                        ✅ Image processed successfully!
+                                    </span>
                                 </div>
                             </div>
                         )}
