@@ -1,23 +1,24 @@
-import React from "react";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
 import {
     Wand2,
     Scissors,
     FileText,
     Tags,
     Sparkles,
-    ArrowRight
-} from "lucide-react";
+    ArrowRight,
+} from 'lucide-react';
 
 const AI_FEATURES = [
     {
         id: 'background-removal',
         name: 'AI Background Removal',
-        description: 'Remove backgrounds from images instantly using advanced AI',
+        description:
+            'Remove backgrounds from images instantly using advanced AI',
         icon: Scissors,
         color: 'text-red-500',
         bgColor: 'bg-red-50',
-        example: 'Perfect for profile photos and product images'
+        example: 'Perfect for profile photos and product images',
     },
     {
         id: 'ocr',
@@ -26,7 +27,7 @@ const AI_FEATURES = [
         icon: FileText,
         color: 'text-blue-500',
         bgColor: 'bg-blue-50',
-        example: 'Digitize receipts, business cards, and documents'
+        example: 'Digitize receipts, business cards, and documents',
     },
     {
         id: 'auto-tag',
@@ -35,16 +36,17 @@ const AI_FEATURES = [
         icon: Tags,
         color: 'text-green-500',
         bgColor: 'bg-green-50',
-        example: 'Organize your photo library effortlessly'
+        example: 'Organize your photo library effortlessly',
     },
     {
         id: 'enhance',
         name: 'Image Enhancement',
-        description: 'Improve image quality, clarity, and lighting automatically',
+        description:
+            'Improve image quality, clarity, and lighting automatically',
         icon: Sparkles,
         color: 'text-purple-500',
         bgColor: 'bg-purple-50',
-        example: 'Enhance old photos and low-quality images'
+        example: 'Enhance old photos and low-quality images',
     },
     {
         id: 'quality-analysis',
@@ -53,7 +55,7 @@ const AI_FEATURES = [
         icon: Sparkles,
         color: 'text-orange-500',
         bgColor: 'bg-orange-50',
-        example: 'Automatically assess image quality levels'
+        example: 'Automatically assess image quality levels',
     },
     {
         id: 'watermark-detection',
@@ -62,7 +64,7 @@ const AI_FEATURES = [
         icon: Scissors,
         color: 'text-pink-500',
         bgColor: 'bg-pink-50',
-        example: 'Identify protected or branded content'
+        example: 'Identify protected or branded content',
     },
     {
         id: 'captioning',
@@ -71,7 +73,7 @@ const AI_FEATURES = [
         icon: FileText,
         color: 'text-indigo-500',
         bgColor: 'bg-indigo-50',
-        example: 'Create alt text and descriptions automatically'
+        example: 'Create alt text and descriptions automatically',
     },
     {
         id: 'document-conversion',
@@ -80,7 +82,7 @@ const AI_FEATURES = [
         icon: FileText,
         color: 'text-teal-500',
         bgColor: 'bg-teal-50',
-        example: 'Word, Excel, PowerPoint to PDF conversion'
+        example: 'Word, Excel, PowerPoint to PDF conversion',
     },
     {
         id: 'ai-vision',
@@ -89,7 +91,7 @@ const AI_FEATURES = [
         icon: Wand2,
         color: 'text-purple-500',
         bgColor: 'bg-purple-50',
-        example: 'Smart tagging, moderation, and general image analysis'
+        example: 'Smart tagging, moderation, and general image analysis',
     },
 ];
 
@@ -113,12 +115,20 @@ export default function AIFeatureShowcase() {
                             key={feature.id}
                             className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                         >
-                            <div className={`w-12 h-12 rounded-full ${feature.bgColor} flex items-center justify-center mb-4`}>
+                            <div
+                                className={`w-12 h-12 rounded-full ${feature.bgColor} flex items-center justify-center mb-4`}
+                            >
                                 <Icon className={`w-6 h-6 ${feature.color}`} />
                             </div>
-                            <h3 className="font-bold text-lg mb-2">{feature.name}</h3>
-                            <p className="text-gray-600 text-sm mb-3">{feature.description}</p>
-                            <p className="text-xs text-gray-500 italic">{feature.example}</p>
+                            <h3 className="font-bold text-lg mb-2">
+                                {feature.name}
+                            </h3>
+                            <p className="text-gray-600 text-sm mb-3">
+                                {feature.description}
+                            </p>
+                            <p className="text-xs text-gray-500 italic">
+                                {feature.example}
+                            </p>
                         </div>
                     );
                 })}
