@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { CldImage } from "next-cloudinary";
+import React, { useState } from 'react';
+import { CldImage } from 'next-cloudinary';
 import {
     Brain,
     Tags,
@@ -14,8 +14,8 @@ import {
     Loader2,
     CheckCircle,
     XCircle,
-    AlertTriangle
-} from "lucide-react";
+    AlertTriangle,
+} from 'lucide-react';
 
 interface TagDefinition {
     name: string;
@@ -36,7 +36,7 @@ const AI_VISION_MODES = [
         icon: Tags,
         color: 'text-blue-500',
         bgColor: 'bg-blue-50',
-        example: 'Define custom tags like "luxury", "outdoor", "professional"'
+        example: 'Define custom tags like "luxury", "outdoor", "professional"',
     },
     {
         id: 'moderation',
@@ -45,7 +45,7 @@ const AI_VISION_MODES = [
         icon: Shield,
         color: 'text-red-500',
         bgColor: 'bg-red-50',
-        example: 'Ask yes/no questions about content policy compliance'
+        example: 'Ask yes/no questions about content policy compliance',
     },
     {
         id: 'general',
@@ -54,7 +54,7 @@ const AI_VISION_MODES = [
         icon: MessageSquare,
         color: 'text-green-500',
         bgColor: 'bg-green-50',
-        example: 'Get detailed descriptions and insights about any image'
+        example: 'Get detailed descriptions and insights about any image',
     },
 ];
 
@@ -65,15 +65,14 @@ export default function AIVision() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [results, setResults] = useState<AIVisionResult | null>(null);
 
-    // Tagging mode state
     const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>([
-        { name: '', description: '' }
+        { name: '', description: '' },
     ]);
 
-    // Moderation mode state
-    const [rejectionQuestions, setRejectionQuestions] = useState<string[]>(['']);
+    const [rejectionQuestions, setRejectionQuestions] = useState<string[]>([
+        '',
+    ]);
 
-    // General mode state
     const [prompts, setPrompts] = useState<string[]>(['']);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +87,10 @@ export default function AIVision() {
 
     const addTagDefinition = () => {
         if (tagDefinitions.length < 10) {
-            setTagDefinitions([...tagDefinitions, { name: '', description: '' }]);
+            setTagDefinitions([
+                ...tagDefinitions,
+                { name: '', description: '' },
+            ]);
         }
     };
 
@@ -98,7 +100,11 @@ export default function AIVision() {
         }
     };
 
-    const updateTagDefinition = (index: number, field: 'name' | 'description', value: string) => {
+    const updateTagDefinition = (
+        index: number,
+        field: 'name' | 'description',
+        value: string
+    ) => {
         const updated = [...tagDefinitions];
         updated[index][field] = value;
         setTagDefinitions(updated);
@@ -112,7 +118,9 @@ export default function AIVision() {
 
     const removeQuestion = (index: number) => {
         if (rejectionQuestions.length > 1) {
-            setRejectionQuestions(rejectionQuestions.filter((_, i) => i !== index));
+            setRejectionQuestions(
+                rejectionQuestions.filter((_, i) => i !== index)
+            );
         }
     };
 
@@ -142,76 +150,78 @@ export default function AIVision() {
 
     const handleAnalyze = async () => {
         if (!file || !previewUrl) {
-            alert("Please select an image first");
+            alert('Please select an image first');
             return;
         }
 
         setIsProcessing(true);
 
         try {
-            // Prepare request based on mode
             let requestData: any = {
                 mode: selectedMode,
-                imageUrl: previewUrl
+                imageUrl: previewUrl,
             };
 
             switch (selectedMode) {
                 case 'tagging':
-                    const validTags = tagDefinitions.filter(tag => tag.name.trim() && tag.description.trim());
+                    const validTags = tagDefinitions.filter(
+                        (tag) => tag.name.trim() && tag.description.trim()
+                    );
                     if (validTags.length === 0) {
-                        alert("Please add at least one valid tag definition");
+                        alert('Please add at least one valid tag definition');
                         return;
                     }
                     requestData.tagDefinitions = validTags;
                     break;
 
                 case 'moderation':
-                    const validQuestions = rejectionQuestions.filter(q => q.trim());
+                    const validQuestions = rejectionQuestions.filter((q) =>
+                        q.trim()
+                    );
                     if (validQuestions.length === 0) {
-                        alert("Please add at least one moderation question");
+                        alert('Please add at least one moderation question');
                         return;
                     }
                     requestData.rejectionQuestions = validQuestions;
                     break;
 
                 case 'general':
-                    const validPrompts = prompts.filter(p => p.trim());
+                    const validPrompts = prompts.filter((p) => p.trim());
                     if (validPrompts.length === 0) {
-                        alert("Please add at least one prompt");
+                        alert('Please add at least one prompt');
                         return;
                     }
                     requestData.prompts = validPrompts;
                     break;
             }
 
-            const response = await fetch("/api/ai-vision", {
-                method: "POST",
+            const response = await fetch('/api/ai-vision', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(requestData),
             });
 
             if (!response.ok) {
-                throw new Error("AI Vision analysis failed");
+                throw new Error('AI Vision analysis failed');
             }
 
             const result = await response.json();
             setResults({
                 mode: selectedMode,
                 data: result.data.analysis,
-                tokensUsed: result.limits?.usage?.count || 0
+                tokensUsed: result.limits?.usage?.count || 0,
             });
-
         } catch (error) {
-            console.error("AI Vision error:", error);
-            alert("AI Vision analysis failed. Please try again.");
+            console.error('AI Vision error:', error);
+            alert('AI Vision analysis failed. Please try again.');
         } finally {
             setIsProcessing(false);
         }
     };
 
-    const selectedModeData = AI_VISION_MODES.find(m => m.id === selectedMode);
+    const selectedModeData = AI_VISION_MODES.find((m) => m.id === selectedMode);
 
     return (
         <div className="container mx-auto p-4 max-w-7xl">
@@ -224,26 +234,34 @@ export default function AIVision() {
                 </p>
             </div>
 
-            {/* Mode Selection */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 {AI_VISION_MODES.map((mode) => {
                     const Icon = mode.icon;
                     return (
                         <div
                             key={mode.id}
-                            className={`card cursor-pointer transition-all duration-200 ${selectedMode === mode.id
+                            className={`card cursor-pointer transition-all duration-200 ${
+                                selectedMode === mode.id
                                     ? 'ring-2 ring-primary shadow-lg'
                                     : 'hover:shadow-md'
-                                }`}
+                            }`}
                             onClick={() => setSelectedMode(mode.id)}
                         >
                             <div className="card-body p-6 text-center">
-                                <div className={`mx-auto w-12 h-12 rounded-full ${mode.bgColor} flex items-center justify-center mb-4`}>
+                                <div
+                                    className={`mx-auto w-12 h-12 rounded-full ${mode.bgColor} flex items-center justify-center mb-4`}
+                                >
                                     <Icon className={`w-6 h-6 ${mode.color}`} />
                                 </div>
-                                <h3 className="font-bold text-lg mb-2">{mode.name}</h3>
-                                <p className="text-sm text-gray-600 mb-3">{mode.description}</p>
-                                <p className="text-xs text-gray-500 italic">{mode.example}</p>
+                                <h3 className="font-bold text-lg mb-2">
+                                    {mode.name}
+                                </h3>
+                                <p className="text-sm text-gray-600 mb-3">
+                                    {mode.description}
+                                </p>
+                                <p className="text-xs text-gray-500 italic">
+                                    {mode.example}
+                                </p>
                             </div>
                         </div>
                     );
@@ -251,7 +269,6 @@ export default function AIVision() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Configuration Panel */}
                 <div className="card bg-base-100 shadow-xl">
                     <div className="card-body">
                         <h2 className="card-title flex items-center gap-2">
@@ -259,7 +276,6 @@ export default function AIVision() {
                             Configure Analysis
                         </h2>
 
-                        {/* Image Upload */}
                         <div className="form-control mb-6">
                             <label className="label">
                                 <span className="label-text">Select Image</span>
@@ -272,24 +288,28 @@ export default function AIVision() {
                             />
                         </div>
 
-                        {/* Mode-specific Configuration */}
                         {selectedModeData && (
                             <div className="alert alert-info mb-6">
                                 <div className="flex items-center gap-2">
                                     <selectedModeData.icon className="w-5 h-5" />
                                     <div>
-                                        <h4 className="font-semibold">{selectedModeData.name}</h4>
-                                        <p className="text-sm">{selectedModeData.description}</p>
+                                        <h4 className="font-semibold">
+                                            {selectedModeData.name}
+                                        </h4>
+                                        <p className="text-sm">
+                                            {selectedModeData.description}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Tagging Mode Configuration */}
                         {selectedMode === 'tagging' && (
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="font-semibold">Tag Definitions</h3>
+                                    <h3 className="font-semibold">
+                                        Tag Definitions
+                                    </h3>
                                     <button
                                         className="btn btn-sm btn-outline"
                                         onClick={addTagDefinition}
@@ -300,13 +320,22 @@ export default function AIVision() {
                                     </button>
                                 </div>
                                 {tagDefinitions.map((tag, index) => (
-                                    <div key={index} className="border rounded-lg p-4 space-y-2">
+                                    <div
+                                        key={index}
+                                        className="border rounded-lg p-4 space-y-2"
+                                    >
                                         <div className="flex justify-between items-center">
-                                            <span className="text-sm font-medium">Tag {index + 1}</span>
+                                            <span className="text-sm font-medium">
+                                                Tag {index + 1}
+                                            </span>
                                             {tagDefinitions.length > 1 && (
                                                 <button
                                                     className="btn btn-xs btn-ghost text-red-500"
-                                                    onClick={() => removeTagDefinition(index)}
+                                                    onClick={() =>
+                                                        removeTagDefinition(
+                                                            index
+                                                        )
+                                                    }
                                                 >
                                                     <Minus className="w-3 h-3" />
                                                 </button>
@@ -316,13 +345,25 @@ export default function AIVision() {
                                             type="text"
                                             placeholder="Tag name (e.g., 'luxury')"
                                             value={tag.name}
-                                            onChange={(e) => updateTagDefinition(index, 'name', e.target.value)}
+                                            onChange={(e) =>
+                                                updateTagDefinition(
+                                                    index,
+                                                    'name',
+                                                    e.target.value
+                                                )
+                                            }
                                             className="input input-bordered input-sm w-full"
                                         />
                                         <textarea
                                             placeholder="Tag description (e.g., 'Does the image show luxury items or settings?')"
                                             value={tag.description}
-                                            onChange={(e) => updateTagDefinition(index, 'description', e.target.value)}
+                                            onChange={(e) =>
+                                                updateTagDefinition(
+                                                    index,
+                                                    'description',
+                                                    e.target.value
+                                                )
+                                            }
                                             className="textarea textarea-bordered textarea-sm w-full"
                                             rows={2}
                                         />
@@ -331,15 +372,18 @@ export default function AIVision() {
                             </div>
                         )}
 
-                        {/* Moderation Mode Configuration */}
                         {selectedMode === 'moderation' && (
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="font-semibold">Moderation Questions</h3>
+                                    <h3 className="font-semibold">
+                                        Moderation Questions
+                                    </h3>
                                     <button
                                         className="btn btn-sm btn-outline"
                                         onClick={addQuestion}
-                                        disabled={rejectionQuestions.length >= 10}
+                                        disabled={
+                                            rejectionQuestions.length >= 10
+                                        }
                                     >
                                         <Plus className="w-4 h-4" />
                                         Add Question
@@ -351,13 +395,20 @@ export default function AIVision() {
                                             type="text"
                                             placeholder="Yes/no question (e.g., 'Does the image contain inappropriate content?')"
                                             value={question}
-                                            onChange={(e) => updateQuestion(index, e.target.value)}
+                                            onChange={(e) =>
+                                                updateQuestion(
+                                                    index,
+                                                    e.target.value
+                                                )
+                                            }
                                             className="input input-bordered input-sm flex-1"
                                         />
                                         {rejectionQuestions.length > 1 && (
                                             <button
                                                 className="btn btn-sm btn-ghost text-red-500"
-                                                onClick={() => removeQuestion(index)}
+                                                onClick={() =>
+                                                    removeQuestion(index)
+                                                }
                                             >
                                                 <Minus className="w-4 h-4" />
                                             </button>
@@ -367,11 +418,12 @@ export default function AIVision() {
                             </div>
                         )}
 
-                        {/* General Mode Configuration */}
                         {selectedMode === 'general' && (
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="font-semibold">Analysis Prompts</h3>
+                                    <h3 className="font-semibold">
+                                        Analysis Prompts
+                                    </h3>
                                     <button
                                         className="btn btn-sm btn-outline"
                                         onClick={addPrompt}
@@ -386,14 +438,21 @@ export default function AIVision() {
                                         <textarea
                                             placeholder="Question or request (e.g., 'Describe this image in detail')"
                                             value={prompt}
-                                            onChange={(e) => updatePrompt(index, e.target.value)}
+                                            onChange={(e) =>
+                                                updatePrompt(
+                                                    index,
+                                                    e.target.value
+                                                )
+                                            }
                                             className="textarea textarea-bordered textarea-sm flex-1"
                                             rows={2}
                                         />
                                         {prompts.length > 1 && (
                                             <button
                                                 className="btn btn-sm btn-ghost text-red-500"
-                                                onClick={() => removePrompt(index)}
+                                                onClick={() =>
+                                                    removePrompt(index)
+                                                }
                                             >
                                                 <Minus className="w-4 h-4" />
                                             </button>
@@ -451,76 +510,144 @@ export default function AIVision() {
                         {results ? (
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="font-semibold">AI Vision Results</h3>
+                                    <h3 className="font-semibold">
+                                        AI Vision Results
+                                    </h3>
                                     <div className="badge badge-info">
                                         {results.tokensUsed} tokens used
                                     </div>
                                 </div>
 
                                 {/* Tagging Results */}
-                                {results.mode === 'tagging' && results.data.tags && (
-                                    <div>
-                                        <h4 className="font-medium mb-2">Detected Tags:</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {results.data.tags.map((tag: any, index: number) => (
-                                                <span key={index} className="badge badge-primary">
-                                                    {tag.name}
-                                                </span>
-                                            ))}
+                                {results.mode === 'tagging' &&
+                                    results.data.tags && (
+                                        <div>
+                                            <h4 className="font-medium mb-2">
+                                                Detected Tags:
+                                            </h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {results.data.tags.map(
+                                                    (
+                                                        tag: any,
+                                                        index: number
+                                                    ) => (
+                                                        <span
+                                                            key={index}
+                                                            className="badge badge-primary"
+                                                        >
+                                                            {tag.name}
+                                                        </span>
+                                                    )
+                                                )}
+                                            </div>
+                                            {results.data.tags.length === 0 && (
+                                                <p className="text-gray-500 italic">
+                                                    No tags matched the criteria
+                                                </p>
+                                            )}
                                         </div>
-                                        {results.data.tags.length === 0 && (
-                                            <p className="text-gray-500 italic">No tags matched the criteria</p>
-                                        )}
-                                    </div>
-                                )}
+                                    )}
 
                                 {/* Moderation Results */}
-                                {results.mode === 'moderation' && results.data.responses && (
-                                    <div>
-                                        <h4 className="font-medium mb-2">Moderation Responses:</h4>
-                                        <div className="space-y-2">
-                                            {results.data.responses.map((response: any, index: number) => (
-                                                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                    <span className="text-sm">{response.prompt}</span>
-                                                    <div className="flex items-center gap-2">
-                                                        {response.value === 'yes' && <XCircle className="w-4 h-4 text-red-500" />}
-                                                        {response.value === 'no' && <CheckCircle className="w-4 h-4 text-green-500" />}
-                                                        {response.value === 'unknown' && <AlertTriangle className="w-4 h-4 text-yellow-500" />}
-                                                        <span className={`text-sm font-medium ${response.value === 'yes' ? 'text-red-500' :
-                                                                response.value === 'no' ? 'text-green-500' : 'text-yellow-500'
-                                                            }`}>
-                                                            {response.value}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                {results.mode === 'moderation' &&
+                                    results.data.responses && (
+                                        <div>
+                                            <h4 className="font-medium mb-2">
+                                                Moderation Responses:
+                                            </h4>
+                                            <div className="space-y-2">
+                                                {results.data.responses.map(
+                                                    (
+                                                        response: any,
+                                                        index: number
+                                                    ) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                                        >
+                                                            <span className="text-sm">
+                                                                {
+                                                                    response.prompt
+                                                                }
+                                                            </span>
+                                                            <div className="flex items-center gap-2">
+                                                                {response.value ===
+                                                                    'yes' && (
+                                                                    <XCircle className="w-4 h-4 text-red-500" />
+                                                                )}
+                                                                {response.value ===
+                                                                    'no' && (
+                                                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                                                )}
+                                                                {response.value ===
+                                                                    'unknown' && (
+                                                                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                                                                )}
+                                                                <span
+                                                                    className={`text-sm font-medium ${
+                                                                        response.value ===
+                                                                        'yes'
+                                                                            ? 'text-red-500'
+                                                                            : response.value ===
+                                                                                'no'
+                                                                              ? 'text-green-500'
+                                                                              : 'text-yellow-500'
+                                                                    }`}
+                                                                >
+                                                                    {
+                                                                        response.value
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 {/* General Results */}
-                                {results.mode === 'general' && results.data.responses && (
-                                    <div>
-                                        <h4 className="font-medium mb-2">AI Responses:</h4>
-                                        <div className="space-y-4">
-                                            {results.data.responses.map((response: any, index: number) => (
-                                                <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                                                    <p className="text-sm whitespace-pre-wrap">{response.value}</p>
-                                                </div>
-                                            ))}
+                                {results.mode === 'general' &&
+                                    results.data.responses && (
+                                        <div>
+                                            <h4 className="font-medium mb-2">
+                                                AI Responses:
+                                            </h4>
+                                            <div className="space-y-4">
+                                                {results.data.responses.map(
+                                                    (
+                                                        response: any,
+                                                        index: number
+                                                    ) => (
+                                                        <div
+                                                            key={index}
+                                                            className="bg-gray-50 p-4 rounded-lg"
+                                                        >
+                                                            <p className="text-sm whitespace-pre-wrap">
+                                                                {response.value}
+                                                            </p>
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 <div className="alert alert-success">
                                     <CheckCircle className="w-5 h-5" />
-                                    <span>AI Vision analysis completed successfully!</span>
+                                    <span>
+                                        AI Vision analysis completed
+                                        successfully!
+                                    </span>
                                 </div>
                             </div>
                         ) : (
                             <div className="text-center py-12 text-gray-500">
                                 <Brain className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                                <p>Select an image and configure analysis to see results</p>
+                                <p>
+                                    Select an image and configure analysis to
+                                    see results
+                                </p>
                             </div>
                         )}
                     </div>
