@@ -16,6 +16,7 @@ import {
     GalleryHorizontalIcon,
     FileTextIcon,
     BrainIcon,
+    UsersIcon,
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -26,7 +27,9 @@ const sidebarItems = [
     { href: '/ai-studio', icon: Wand2Icon, label: 'AI Studio' },
     { href: '/ai-gallery', icon: GalleryHorizontalIcon, label: 'AI Gallery' },
     { href: '/ai-vision', icon: BrainIcon, label: 'AI Vision' },
+    { href: '/face-studio', icon: UsersIcon, label: 'Face Studio' },
     { href: '/document-studio', icon: FileTextIcon, label: 'Document Studio' },
+    { href: '/bg-test', icon: Wand2Icon, label: 'BG Test' },
 ];
 
 export default function AppLayout({
@@ -127,11 +130,10 @@ export default function AppLayout({
                             <li key={item.href} className="mb-2">
                                 <Link
                                     href={item.href}
-                                    className={`flex items-center space-x-4 px-4 py-2 rounded-lg ${
-                                        pathname === item.href
-                                            ? 'bg-primary text-white'
-                                            : 'hover:bg-base-300'
-                                    }`}
+                                    className={`flex items-center space-x-4 px-4 py-2 rounded-lg ${pathname === item.href
+                                        ? 'bg-primary text-white'
+                                        : 'hover:bg-base-300'
+                                        }`}
                                     onClick={() => setSidebarOpen(false)}
                                 >
                                     <item.icon className="w-6 h-6" />
