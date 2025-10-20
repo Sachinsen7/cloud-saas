@@ -12,6 +12,7 @@ import {
     Image,
     FileText as FileTextIcon,
     Brain as BrainIcon,
+    Users as UsersIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -69,6 +70,10 @@ const Home = () => {
                     <Link href="/ai-studio" className="btn btn-secondary">
                         <Wand2 className="w-5 h-5 mr-2" />
                         AI Studio
+                    </Link>
+                    <Link href="/face-studio" className="btn btn-success">
+                        <UsersIcon className="w-5 h-5 mr-2" />
+                        Face Studio
                     </Link>
                     <Link href="/ai-vision" className="btn btn-accent">
                         <BrainIcon className="w-5 h-5 mr-2" />
@@ -148,7 +153,7 @@ const Home = () => {
                     <div className="stat-title text-purple-100">
                         AI Features
                     </div>
-                    <div className="stat-value">8</div>
+                    <div className="stat-value">9</div>
                     <div className="stat-desc text-purple-200">
                         Advanced AI tools available
                     </div>
