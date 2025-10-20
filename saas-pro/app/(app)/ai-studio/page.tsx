@@ -31,7 +31,7 @@ const AI_FEATURES = [
     {
         id: 'background-removal',
         name: 'Background Removal',
-        description: 'Remove background from images using AI',
+        description: 'Remove background from images using AI (Updated Method)',
         icon: Scissors,
         color: 'text-red-500',
         bgColor: 'bg-red-50',
@@ -159,10 +159,28 @@ export default function AIStudio() {
 
     const downloadProcessedImage = () => {
         if (processedImage?.processedUrl) {
-            const link = document.createElement('a');
-            link.href = processedImage.processedUrl;
-            link.download = `${processedImage.title}_processed.png`;
-            link.click();
+            // Create a proper download link with CORS handling
+            fetch(processedImage.processedUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${processedImage.title}_processed.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => {
+                    console.error('Download failed:', error);
+                    // Fallback to direct link
+                    const link = document.createElement('a');
+                    link.href = processedImage.processedUrl;
+                    link.download = `${processedImage.title}_processed.png`;
+                    link.target = '_blank';
+                    link.click();
+                });
         }
     };
 
@@ -188,11 +206,10 @@ export default function AIStudio() {
                     return (
                         <div
                             key={feature.id}
-                            className={`card cursor-pointer transition-all duration-200 ${
-                                selectedFeature === feature.id
-                                    ? 'ring-2 ring-primary shadow-lg'
-                                    : 'hover:shadow-md'
-                            }`}
+                            className={`card cursor-pointer transition-all duration-200 ${selectedFeature === feature.id
+                                ? 'ring-2 ring-primary shadow-lg'
+                                : 'hover:shadow-md'
+                                }`}
                             onClick={() => setSelectedFeature(feature.id)}
                         >
                             <div className="card-body p-4 text-center">
@@ -325,28 +342,67 @@ export default function AIStudio() {
 
                         {processedImage && (
                             <div className="space-y-4">
-                                {/* Processed Image */}
+                                {/* Processed Images */}
                                 {processedImage.processedUrl && (
                                     <div>
                                         <h3 className="font-semibold mb-2">
                                             Processed Image:
                                         </h3>
-                                        <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                                            <img
-                                                src={
-                                                    processedImage.processedUrl
-                                                }
-                                                alt="Processed"
-                                                className="w-full h-full object-contain"
-                                            />
+                                        <div className="grid grid-cols-1 gap-4">
+                                            {/* Standard Background Removal */}
+                                            <div className="bg-white p-3 rounded-lg border">
+                                                <h4 className="font-medium mb-2">Standard Background Removal</h4>
+                                                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-2">
+                                                    <img
+                                                        src={processedImage.processedUrl}
+                                                        alt="Background Removed"
+                                                        className="w-full h-full object-contain"
+                                                    />
+                                                </div>
+                                                <button
+                                                    className="btn btn-sm btn-primary"
+                                                    onClick={() => {
+                                                        const link = document.createElement('a');
+                                                        link.href = processedImage.processedUrl;
+                                                        link.download = `${processedImage.title}_bg_removed.png`;
+                                                        link.target = '_blank';
+                                                        link.rel = 'noopener noreferrer';
+                                                        document.body.appendChild(link);
+                                                        link.click();
+                                                        document.body.removeChild(link);
+                                                    }}
+                                                >
+                                                    <Download className="w-4 h-4" />
+                                                    Download PNG
+                                                </button>
+                                            </div>
+
+                                            {/* Fine Edges Background Removal */}
+                                            {processedImage.processedData?.fineEdgesUrl && (
+                                                <div className="bg-white p-3 rounded-lg border">
+                                                    <h4 className="font-medium mb-2">Fine Edges (Better Quality)</h4>
+                                                    <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-2">
+                                                        <img
+                                                            src={processedImage.processedData.fineEdgesUrl}
+                                                            alt="Background Removed - Fine Edges"
+                                                            className="w-full h-full object-contain"
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        className="btn btn-sm btn-secondary"
+                                                        onClick={() => {
+                                                            const link = document.createElement('a');
+                                                            link.href = processedImage.processedData.fineEdgesUrl;
+                                                            link.download = `${processedImage.title}_fine_edges.png`;
+                                                            link.click();
+                                                        }}
+                                                    >
+                                                        <Download className="w-4 h-4" />
+                                                        Download Fine Edges PNG
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
-                                        <button
-                                            className="btn btn-sm btn-primary mt-2"
-                                            onClick={downloadProcessedImage}
-                                        >
-                                            <Download className="w-4 h-4" />
-                                            Download
-                                        </button>
                                     </div>
                                 )}
 
@@ -396,6 +452,78 @@ export default function AIStudio() {
                                             </div>
                                         </div>
                                     )}
+
+                                {/* AI Caption */}
+                                {processedImage.processedData?.aiCaption && (
+                                    <div>
+                                        <h3 className="font-semibold mb-2">AI Caption:</h3>
+                                        <div className="bg-blue-50 p-4 rounded-lg">
+                                            <p className="text-sm">{processedImage.processedData.aiCaption}</p>
+                                            <button
+                                                className="btn btn-sm btn-outline mt-2"
+                                                onClick={() => copyToClipboard(processedImage.processedData.aiCaption)}
+                                            >
+                                                <Copy className="w-4 h-4" />
+                                                Copy Caption
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Quality Analysis */}
+                                {processedImage.processedData?.qualityScore !== undefined && (
+                                    <div>
+                                        <h3 className="font-semibold mb-2">Quality Analysis:</h3>
+                                        <div className="bg-orange-50 p-4 rounded-lg">
+                                            <div className="flex items-center gap-4">
+                                                <div>
+                                                    <p className="text-sm font-medium">Score: {(processedImage.processedData.qualityScore * 100).toFixed(1)}%</p>
+                                                    <p className="text-sm">Level: <span className="capitalize">{processedImage.processedData.qualityLevel}</span></p>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                            className="bg-orange-500 h-2 rounded-full"
+                                                            style={{ width: `${processedImage.processedData.qualityScore * 100}%` }}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Watermark Detection */}
+                                {processedImage.processedData?.watermarkDetected && (
+                                    <div>
+                                        <h3 className="font-semibold mb-2">Watermark Detection:</h3>
+                                        <div className="bg-pink-50 p-4 rounded-lg">
+                                            <span className={`badge ${processedImage.processedData.watermarkDetected === 'clean' ? 'badge-success' :
+                                                processedImage.processedData.watermarkDetected === 'watermark' ? 'badge-warning' :
+                                                    'badge-error'
+                                                }`}>
+                                                {processedImage.processedData.watermarkDetected.toUpperCase()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Object Detection */}
+                                {processedImage.processedData?.objectDetection && processedImage.processedData.objectDetection.length > 0 && (
+                                    <div>
+                                        <h3 className="font-semibold mb-2">Detected Objects:</h3>
+                                        <div className="bg-teal-50 p-4 rounded-lg">
+                                            <div className="space-y-2">
+                                                {processedImage.processedData.objectDetection.slice(0, 5).map((obj: any, index: number) => (
+                                                    <div key={index} className="flex justify-between items-center">
+                                                        <span className="text-sm font-medium capitalize">{obj.object}</span>
+                                                        <span className="text-xs text-gray-500">{(obj.confidence * 100).toFixed(1)}%</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Success Message */}
                                 <div className="alert alert-success">
