@@ -22,6 +22,11 @@ interface AIImage {
     extractedText?: string;
     hasBackgroundRemoved: boolean;
     isEnhanced: boolean;
+    aiCaption?: string;
+    qualityScore?: number;
+    qualityLevel?: string;
+    watermarkDetected?: string;
+    objectDetection?: any;
     createdAt: string;
 }
 
@@ -71,6 +76,31 @@ export default function AIGallery() {
         alert('Copied to clipboard!');
     };
 
+    // Function to get the best image URL (processed if available, otherwise original)
+    const getImageUrl = (image: AIImage) => {
+        // Check if we have processed URLs stored
+        if (image.objectDetection && typeof image.objectDetection === 'object') {
+            const processedUrls = image.objectDetection.processedUrls;
+            if (processedUrls?.processedUrl) {
+                return processedUrls.processedUrl;
+            }
+        }
+
+        // Fallback to generating processed URL based on processing type
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+        if (image.hasBackgroundRemoved) {
+            return `https://res.cloudinary.com/${cloudName}/image/upload/e_background_removal,f_png/${image.publicId}`;
+        }
+
+        if (image.isEnhanced) {
+            return `https://res.cloudinary.com/${cloudName}/image/upload/e_viesus_correct,q_auto:best/${image.publicId}`;
+        }
+
+        // Return original if no processing
+        return `https://res.cloudinary.com/${cloudName}/image/upload/${image.publicId}`;
+    };
+
     const getFilteredImages = () => {
         switch (filter) {
             case 'background-removed':
@@ -81,6 +111,10 @@ export default function AIGallery() {
                 return images.filter((img) => img.extractedText);
             case 'tagged':
                 return images.filter((img) => img.tags.length > 0);
+            case 'captioned':
+                return images.filter((img) => img.aiCaption);
+            case 'quality-analyzed':
+                return images.filter((img) => img.qualityScore !== undefined);
             default:
                 return images;
         }
@@ -143,6 +177,20 @@ export default function AIGallery() {
                     <Tag className="w-4 h-4" />
                     Tagged
                 </button>
+                <button
+                    className={`btn btn-sm ${filter === 'captioned' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setFilter('captioned')}
+                >
+                    <FileText className="w-4 h-4" />
+                    Captioned
+                </button>
+                <button
+                    className={`btn btn-sm ${filter === 'quality-analyzed' ? 'btn-primary' : 'btn-outline'}`}
+                    onClick={() => setFilter('quality-analyzed')}
+                >
+                    <Eye className="w-4 h-4" />
+                    Quality Analyzed
+                </button>
             </div>
 
             {filteredImages.length === 0 ? (
@@ -162,12 +210,15 @@ export default function AIGallery() {
                             className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all"
                         >
                             <figure className="aspect-square relative">
-                                <CldImage
-                                    width={300}
-                                    height={300}
-                                    src={image.publicId}
+                                <img
+                                    src={getImageUrl(image)}
                                     alt={image.title}
                                     className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                        // Fallback to original if processed image fails
+                                        const target = e.target as HTMLImageElement;
+                                        target.src = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${image.publicId}`;
+                                    }}
                                 />
 
                                 {/* Processing badges */}
@@ -235,10 +286,11 @@ export default function AIGallery() {
                                     <button
                                         className="btn btn-sm btn-primary"
                                         onClick={() => {
-                                            const link =
-                                                document.createElement('a');
-                                            link.href = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${image.publicId}`;
-                                            link.download = `${image.title}.jpg`;
+                                            const imageUrl = getImageUrl(image);
+                                            const link = document.createElement('a');
+                                            link.href = imageUrl;
+                                            link.download = `${image.title}_processed.${image.hasBackgroundRemoved ? 'png' : 'jpg'}`;
+                                            link.target = '_blank';
                                             link.click();
                                         }}
                                     >
@@ -262,12 +314,15 @@ export default function AIGallery() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Image */}
                             <div>
-                                <CldImage
-                                    width={500}
-                                    height={500}
-                                    src={selectedImage.publicId}
+                                <img
+                                    src={getImageUrl(selectedImage)}
                                     alt={selectedImage.title}
                                     className="w-full rounded-lg"
+                                    onError={(e) => {
+                                        // Fallback to original if processed image fails
+                                        const target = e.target as HTMLImageElement;
+                                        target.src = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedImage.publicId}`;
+                                    }}
                                 />
                             </div>
 
