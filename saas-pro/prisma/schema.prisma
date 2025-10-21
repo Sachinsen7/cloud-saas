@@ -48,6 +48,12 @@ model Image {
   aiVisionModeration   Json? 
   aiVisionGeneral      Json? // General AI responses
   tokensUsed           Int? 
+  // Advanced Facial Attributes Detection fields
+  facialAttributes     Json? // Complete facial analysis data
+  faceCount            Int? // Number of faces detected
+  hasFaces             Boolean @default(false)
+  facesBoundingBoxes   Json? // Face locations and bounding boxes
+  facialLandmarks      Json? // Eye, nose, mouth positions
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }
