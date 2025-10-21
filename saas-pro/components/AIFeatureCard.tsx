@@ -36,7 +36,7 @@ const AI_FEATURES = [
         icon: Tags,
         color: 'text-green-500',
         bgColor: 'bg-green-50',
-        example: 'Organize your photo library effortlessly',
+        example: 'Organize your photo library Effortlessly',
     },
     {
         id: 'enhance',
