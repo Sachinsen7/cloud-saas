@@ -23,7 +23,7 @@ const AI_FEATURES = [
     {
         id: 'ocr',
         name: 'Text Extraction (OCR)',
-        description: 'Extract text from images, documents, and Screenshots',
+        description: 'Extract text from images, documents, and creenshots',
         icon: FileText,
         color: 'text-blue-500',
         bgColor: 'bg-blue-50',
@@ -97,7 +97,8 @@ const AI_FEATURES = [
 
 export default function AIFeatureShowcase() {
     return (
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-8 mb-8">
+        <div className="bg-gray-900/70 rounded-xl p-6 shadow-md border border-gray-700">
+
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                     AI-Powered Image Processing
@@ -113,7 +114,12 @@ export default function AIFeatureShowcase() {
                     return (
                         <div
                             key={feature.id}
-                            className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                            className="bg-gradient-to-br from-gray-900/90 to-gray-800/80 
+             rounded-2xl p-6 border border-gray-700/50 
+             shadow-[0_0_15px_rgba(139,92,246,0.15)] 
+             hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] 
+             hover:-translate-y-2 hover:scale-[1.03] 
+             transition-all duration-300 ease-out"
                         >
                             <div
                                 className={`w-12 h-12 rounded-full ${feature.bgColor} flex items-center justify-center mb-4`}
@@ -141,6 +147,6 @@ export default function AIFeatureShowcase() {
                     <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
             </div>
-        </div>
+        </div >
     );
 }
