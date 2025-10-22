@@ -19,6 +19,7 @@ const AI_FEATURES = [
         color: 'text-red-500',
         bgColor: 'bg-red-50',
         example: 'Perfect for profile photos and Product images',
+
     },
     {
         id: 'ocr',
@@ -83,6 +84,15 @@ const AI_FEATURES = [
         color: 'text-teal-500',
         bgColor: 'bg-teal-50',
         example: 'Word, Excel, PowerPoint to PDF conversion',
+    },
+    {
+        id: 'face-detection',
+        name: 'Advanced Face Detection',
+        description: 'Detect faces and facial attributes with Azure AI',
+        icon: Sparkles,
+        color: 'text-rose-500',
+        bgColor: 'bg-rose-50',
+        example: 'Face cropping, overlays, and red-eye removal',
     },
     {
         id: 'ai-vision',
