@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -107,7 +108,7 @@ const AI_FEATURES = [
 
 export default function AIFeatureShowcase() {
     return (
-        <div className="bg-gray-900/70 rounded-xl p-6 shadow-md border border-gray-700">
+        <div className="bg-gray-900/70  p-6 shadow-md  border-gray-700">
 
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
@@ -125,10 +126,7 @@ export default function AIFeatureShowcase() {
                         <div
                             key={feature.id}
                             className="bg-gradient-to-br from-gray-900/90 to-gray-800/80 
-             rounded-2xl p-6 border border-gray-700/50 
-             shadow-[0_0_15px_rgba(139,92,246,0.15)] 
-             hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] 
-             hover:-translate-y-2 hover:scale-[1.03] 
+             p-6 border border-gray-700/50 
              transition-all duration-300 ease-out"
                         >
                             <div

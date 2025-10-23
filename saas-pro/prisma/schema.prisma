@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -21,9 +15,9 @@ model Video {
   publicId       String
   originalSize   String
   compressedSize String
-  duration       Float
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  duration       Float
 }
 
 model Image {
@@ -33,41 +27,38 @@ model Image {
   publicId             String
   originalSize         String
   fileType             String
-  tags                 String[] // Auto-generated tags from AI
-  extractedText        String? 
+  tags                 String[]
+  extractedText        String?
   hasBackgroundRemoved Boolean  @default(false)
   isEnhanced           Boolean  @default(false)
-  // AI Content Analysis fields
-  aiCaption            String? 
-  qualityScore         Float? 
-  qualityLevel         String? // low, medium, high
-  watermarkDetected    String? 
-  objectDetection      Json? 
-  // AI Vision fields
-  aiVisionTags         Json?
-  aiVisionModeration   Json? 
-  aiVisionGeneral      Json? // General AI responses
-  tokensUsed           Int? 
-  // Advanced Facial Attributes Detection fields
-  facialAttributes     Json? // Complete facial analysis data
-  faceCount            Int? // Number of faces detected
-  hasFaces             Boolean @default(false)
-  facesBoundingBoxes   Json? // Face locations and bounding boxes
-  facialLandmarks      Json? // Eye, nose, mouth positions
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+  aiCaption            String?
+  objectDetection      Json?
+  qualityLevel         String?
+  qualityScore         Float?
+  watermarkDetected    String?
+  aiVisionGeneral      Json?
+  aiVisionModeration   Json?
+  aiVisionTags         Json?
+  tokensUsed           Int?
+  faceCount            Int?
+  facesBoundingBoxes   Json?
+  facialAttributes     Json?
+  facialLandmarks      Json?
+  hasFaces             Boolean  @default(false)
 }
 
 model Document {
   id                String   @id @default(cuid())
   title             String
   description       String?
-  originalPublicId  String 
+  originalPublicId  String
   pdfPublicId       String?
   thumbnailPublicId String?
   originalSize      String
-  fileType          String 
-  conversionStatus  String   @default("pending") 
+  fileType          String
+  conversionStatus  String   @default("pending")
   pageCount         Int?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
