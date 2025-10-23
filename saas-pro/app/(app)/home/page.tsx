@@ -54,7 +54,7 @@ const Home = () => {
     return (
         <div className="container mx-auto p-4 max-w-7xl">
             <div className="text-center mb-12">
-                <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-200 bg-clip-text text-transparent">
+                <h1 className="text-5xl font-bold mb-4 bg-[#4e4cc7] bg-clip-text text-transparent">
                     Cloud SaaS Media Platform
                 </h1>
                 <p className="text-xl text-gray-500 mb-8">
@@ -92,7 +92,7 @@ const Home = () => {
 
             <AIFeatureShowcase />
 
-            <div className="mb-8">
+            <div className="  mt-12 mb-8">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-3xl font-bold flex items-center gap-2">
                         <VideoIcon className="w-8 h-8" />
@@ -132,58 +132,6 @@ const Home = () => {
                         ))}
                     </div>
                 )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div className="stat bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl">
-                    <div className="stat-figure text-blue-200">
-                        <VideoIcon className="w-8 h-8" />
-                    </div>
-                    <div className="stat-title text-blue-100">Total Videos</div>
-                    <div className="stat-value">{videos.length}</div>
-                    <div className="stat-desc text-blue-200">
-                        Uploaded and processed
-                    </div>
-                </div>
-
-                <div className="stat bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl">
-                    <div className="stat-figure text-purple-200">
-                        <Wand2 className="w-8 h-8" />
-                    </div>
-                    <div className="stat-title text-purple-100">
-                        AI Features
-                    </div>
-                    <div className="stat-value">9</div>
-                    <div className="stat-desc text-purple-200">
-                        Advanced AI tools available
-                    </div>
-                </div>
-
-                <div className="stat bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl">
-                    <div className="stat-figure text-teal-200">
-                        <FileTextIcon className="w-8 h-8" />
-                    </div>
-                    <div className="stat-title text-teal-100">
-                        Document Formats
-                    </div>
-                    <div className="stat-value">12</div>
-                    <div className="stat-desc text-teal-200">
-                        Office formats supported
-                    </div>
-                </div>
-
-                <div className="stat bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl">
-                    <div className="stat-figure text-green-200">
-                        <Image className="w-8 h-8" />
-                    </div>
-                    <div className="stat-title text-green-100">
-                        Social Formats
-                    </div>
-                    <div className="stat-value">5</div>
-                    <div className="stat-desc text-green-200">
-                        Social media formats supported
-                    </div>
-                </div>
             </div>
         </div>
     );

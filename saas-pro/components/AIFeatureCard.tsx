@@ -111,7 +111,7 @@ export default function AIFeatureShowcase() {
         <div className="bg-gray-900/70  p-6 shadow-md  border-gray-700">
 
             <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold mb-4 bg-[#5552dd] bg-clip-text text-transparent">
                     AI-Powered Image Processing
                 </h2>
                 <p className="text-gray-600 text-lg">
