@@ -191,7 +191,7 @@ export default function AIStudio() {
     return (
         <div className="container mx-auto p-4 max-w-6xl">
             <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold mb-4 bg-[#4d4af0] bg-clip-text text-transparent">
+                <h1 className="text-4xl font-bold mb-4 bg-[#5754e8] bg-clip-text text-transparent">
                     AI Studio
                 </h1>
                 <p className="text-lg text-gray-600">

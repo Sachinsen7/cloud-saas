@@ -54,7 +54,7 @@ const Home = () => {
     return (
         <div className="container mx-auto p-4 max-w-7xl">
             <div className="text-center mb-12">
-                <h1 className="text-5xl font-bold mb-4 bg-[#6d3be9] bg-clip-text text-transparent">
+                <h1 className="text-5xl font-bold mb-4 bg-[#5754e8] bg-clip-text text-transparent">
                     Cloud SaaS Media Platform
                 </h1>
                 <p className="text-xl text-gray-500 mb-8">
