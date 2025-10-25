@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import {
     Users,
     Eye,
-
     Scissors,
     Upload,
     Download,
@@ -22,6 +21,20 @@ interface ProcessedFaceImage {
     faceCount: number;
     hasFaces: boolean;
     facialAttributes?: Array<{
+        attributes?: {
+            glasses?: string;
+            blur?: { blurLevel: string };
+            exposure?: { exposureLevel: string };
+            noise?: { noiseLevel: string };
+            head_pose?: { pitch: number; roll: number; yaw: number };
+            [key: string]: unknown;
+        };
+        bounding_box?: {
+            left: number;
+            top: number;
+            width: number;
+            height: number;
+        };
         [key: string]: unknown;
     }>;
     facesBoundingBoxes?: Array<{
@@ -31,6 +44,7 @@ interface ProcessedFaceImage {
         [key: string]: unknown;
     }>;
     faceDetectionData?: {
+        tags?: string[];
         [key: string]: unknown;
     };
     originalUrl?: string;
@@ -147,7 +161,25 @@ export default function FaceStudio() {
         (f) => f.id === selectedFeature
     );
 
-    const renderFaceAttributes = (attributes: Array<{ [key: string]: unknown }>) => {
+    const renderFaceAttributes = (
+        attributes: Array<{
+            attributes?: {
+                glasses?: string;
+                blur?: { blurLevel: string };
+                exposure?: { exposureLevel: string };
+                noise?: { noiseLevel: string };
+                head_pose?: { pitch: number; roll: number; yaw: number };
+                [key: string]: unknown;
+            };
+            bounding_box?: {
+                left: number;
+                top: number;
+                width: number;
+                height: number;
+            };
+            [key: string]: unknown;
+        }>
+    ) => {
         if (!attributes || attributes.length === 0) return null;
 
         return (
@@ -235,10 +267,11 @@ export default function FaceStudio() {
                     return (
                         <div
                             key={feature.id}
-                            className={`card cursor-pointer transition-all duration-200 ${selectedFeature === feature.id
-                                ? 'ring-2 ring-primary shadow-lg'
-                                : 'hover:shadow-md'
-                                }`}
+                            className={`card cursor-pointer transition-all duration-200 ${
+                                selectedFeature === feature.id
+                                    ? 'ring-2 ring-primary shadow-lg'
+                                    : 'hover:shadow-md'
+                            }`}
                             onClick={() => setSelectedFeature(feature.id)}
                         >
                             <div className="card-body p-4 text-center">
@@ -436,7 +469,7 @@ export default function FaceStudio() {
 
                                 {processedImage.facialAttributes &&
                                     processedImage.facialAttributes.length >
-                                    0 && (
+                                        0 && (
                                         <div>
                                             <h3 className="font-semibold mb-2">
                                                 Facial Analysis:
