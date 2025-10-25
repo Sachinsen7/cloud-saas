@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -107,10 +108,10 @@ const AI_FEATURES = [
 
 export default function AIFeatureShowcase() {
     return (
-        <div className="bg-gray-900/70 rounded-xl p-6 shadow-md border border-gray-700">
+        <div className="  p-6 shadow-md ">
 
             <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold mb-4 bg-[#5754e8] bg-clip-text text-transparent">
                     AI-Powered Image Processing
                 </h2>
                 <p className="text-gray-600 text-lg">
@@ -124,11 +125,8 @@ export default function AIFeatureShowcase() {
                     return (
                         <div
                             key={feature.id}
-                            className="bg-gradient-to-br from-gray-900/90 to-gray-800/80 
-             rounded-2xl p-6 border border-gray-700/50 
-             shadow-[0_0_15px_rgba(139,92,246,0.15)] 
-             hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] 
-             hover:-translate-y-2 hover:scale-[1.03] 
+                            className="
+             p-6 border border-gray-500/50 
              transition-all duration-300 ease-out"
                         >
                             <div
@@ -139,10 +137,10 @@ export default function AIFeatureShowcase() {
                             <h3 className="font-bold text-lg mb-2">
                                 {feature.name}
                             </h3>
-                            <p className="text-gray-600 text-sm mb-3">
+                            <p className="text-gray-400 text-sm mb-3">
                                 {feature.description}
                             </p>
-                            <p className="text-xs text-gray-500 italic">
+                            <p className="text-xs text-gray-400 italic">
                                 {feature.example}
                             </p>
                         </div>
