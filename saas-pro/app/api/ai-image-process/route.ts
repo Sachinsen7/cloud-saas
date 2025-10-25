@@ -15,7 +15,7 @@ interface CloudinaryUploadResponse {
     public_id: string;
     bytes: number;
     format: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export async function POST(request: NextRequest) {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         );
 
         // Process based on type
-        let processedData: any = {};
+        let processedData: Record<string, unknown> = {};
 
         switch (processType) {
             case 'background-removal':
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
                     },
                     processedAt: new Date().toISOString(),
                     originalData: processedData.objectDetection || null
-                } as any,
+                },
             },
         });
 
@@ -211,7 +211,7 @@ async function processAutoTag(publicId: string) {
         const detectedObjects = [];
         for (const [model, data] of Object.entries(detectionData)) {
             if (data && typeof data === 'object' && 'tags' in data) {
-                const modelTags = (data as any).tags;
+                const modelTags = (data as { tags: Record<string, unknown> }).tags;
                 for (const [objectName, detections] of Object.entries(
                     modelTags
                 )) {
@@ -372,13 +372,13 @@ async function processAdvancedObjectDetection(publicId: string) {
 
         for (const [model, data] of Object.entries(detectionData)) {
             if (data && typeof data === 'object' && 'tags' in data) {
-                const modelTags = (data as any).tags;
+                const modelTags = (data as { tags: Record<string, unknown> }).tags;
                 for (const [objectName, detections] of Object.entries(
                     modelTags
                 )) {
                     if (Array.isArray(detections)) {
                         detectedObjects.push(
-                            ...detections.map((detection: any) => ({
+                            ...detections.map((detection: { confidence: number }) => ({
                                 object: objectName,
                                 confidence: detection.confidence,
                                 boundingBox: detection['bounding-box'],
