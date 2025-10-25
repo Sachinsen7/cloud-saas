@@ -25,9 +25,9 @@ interface AIVisionResult {
     mode: string;
     data: {
         tags?: Array<{ name: string; confidence: number }>;
-        responses?: Array<{ 
-            text: string; 
-            value: string; 
+        responses?: Array<{
+            text: string;
+            value: string;
             prompt?: string;
         }>;
         [key: string]: unknown;
