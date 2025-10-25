@@ -29,7 +29,7 @@ const Home = () => {
             } else {
                 throw new Error('Invalid response data');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.log(error);
             setError(error);
         } finally {
