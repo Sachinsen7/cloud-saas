@@ -124,15 +124,19 @@ export async function POST(request: NextRequest) {
                 originalSize: uploadResult.bytes.toString(),
                 fileType: uploadResult.format,
                 tags: processedData.tags || [],
-                facialAttributes: faces,
+                facialAttributes: JSON.parse(JSON.stringify(faces)),
                 faceCount: faces.length,
                 hasFaces: faces.length > 0,
-                facesBoundingBoxes: faces.map(
-                    (face) => face.bounding_box
+                facesBoundingBoxes: JSON.parse(
+                    JSON.stringify(faces.map((face) => face.bounding_box))
                 ),
-                facialLandmarks: faces
-                    .map((face) => face.facial_landmarks)
-                    .filter(Boolean),
+                facialLandmarks: JSON.parse(
+                    JSON.stringify(
+                        faces
+                            .map((face) => face.facial_landmarks)
+                            .filter(Boolean)
+                    )
+                ),
             },
         });
 
