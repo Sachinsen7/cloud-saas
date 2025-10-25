@@ -7,7 +7,6 @@ import {
     Tags,
     Shield,
     MessageSquare,
-
     Eye,
     Plus,
     Minus,
@@ -25,6 +24,12 @@ interface TagDefinition {
 interface AIVisionResult {
     mode: string;
     data: {
+        tags?: Array<{ name: string; confidence: number }>;
+        responses?: Array<{ 
+            text: string; 
+            value: string; 
+            prompt?: string;
+        }>;
         [key: string]: unknown;
     };
     tokensUsed: number;
@@ -163,7 +168,8 @@ export default function AIVision() {
                 mode: string;
                 imageUrl: string;
                 tagDefinitions?: TagDefinition[];
-                prompt?: string;
+                rejectionQuestions?: string[];
+                prompts?: string[];
             } = {
                 mode: selectedMode,
                 imageUrl: previewUrl,
@@ -247,10 +253,11 @@ export default function AIVision() {
                     return (
                         <div
                             key={mode.id}
-                            className={`card cursor-pointer transition-all duration-200 ${selectedMode === mode.id
-                                ? 'ring-2 ring-primary shadow-lg'
-                                : 'hover:shadow-md'
-                                }`}
+                            className={`card cursor-pointer transition-all duration-200 ${
+                                selectedMode === mode.id
+                                    ? 'ring-2 ring-primary shadow-lg'
+                                    : 'hover:shadow-md'
+                            }`}
                             onClick={() => setSelectedMode(mode.id)}
                         >
                             <div className="card-body p-6 text-center">
@@ -534,7 +541,10 @@ export default function AIVision() {
                                             <div className="flex flex-wrap gap-2">
                                                 {results.data.tags.map(
                                                     (
-                                                        tag: { name: string; confidence: number },
+                                                        tag: {
+                                                            name: string;
+                                                            confidence: number;
+                                                        },
                                                         index: number
                                                     ) => (
                                                         <span
@@ -564,7 +574,11 @@ export default function AIVision() {
                                             <div className="space-y-2">
                                                 {results.data.responses.map(
                                                     (
-                                                        response: { text: string },
+                                                        response: {
+                                                            text: string;
+                                                            value: string;
+                                                            prompt?: string;
+                                                        },
                                                         index: number
                                                     ) => (
                                                         <div
@@ -579,25 +593,26 @@ export default function AIVision() {
                                                             <div className="flex items-center gap-2">
                                                                 {response.value ===
                                                                     'yes' && (
-                                                                        <XCircle className="w-4 h-4 text-red-500" />
-                                                                    )}
+                                                                    <XCircle className="w-4 h-4 text-red-500" />
+                                                                )}
                                                                 {response.value ===
                                                                     'no' && (
-                                                                        <CheckCircle className="w-4 h-4 text-green-500" />
-                                                                    )}
+                                                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                                                )}
                                                                 {response.value ===
                                                                     'unknown' && (
-                                                                        <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                                                                    )}
+                                                                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                                                                )}
                                                                 <span
-                                                                    className={`text-sm font-medium ${response.value ===
+                                                                    className={`text-sm font-medium ${
+                                                                        response.value ===
                                                                         'yes'
-                                                                        ? 'text-red-500'
-                                                                        : response.value ===
-                                                                            'no'
-                                                                            ? 'text-green-500'
-                                                                            : 'text-yellow-500'
-                                                                        }`}
+                                                                            ? 'text-red-500'
+                                                                            : response.value ===
+                                                                                'no'
+                                                                              ? 'text-green-500'
+                                                                              : 'text-yellow-500'
+                                                                    }`}
                                                                 >
                                                                     {
                                                                         response.value
@@ -621,7 +636,9 @@ export default function AIVision() {
                                             <div className="space-y-4">
                                                 {results.data.responses.map(
                                                     (
-                                                        response: { value: string },
+                                                        response: {
+                                                            value: string;
+                                                        },
                                                         index: number
                                                     ) => (
                                                         <div
