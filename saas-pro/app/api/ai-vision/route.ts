@@ -45,7 +45,8 @@ export async function POST(request: NextRequest) {
         const payload: {
             source: { uri: string };
             tag_definitions?: Array<{ name: string; description: string }>;
-            prompt?: string;
+            rejection_questions?: string[];
+            prompts?: string[];
         } = {
             source: { uri: imageUrl },
         };
@@ -121,6 +122,10 @@ export async function POST(request: NextRequest) {
                         tags?: string[];
                         aiCaption?: string;
                         objectDetection?: unknown;
+                        tokensUsed?: number;
+                        aiVisionTags?: unknown;
+                        aiVisionModeration?: unknown;
+                        aiVisionGeneral?: unknown;
                     } = {
                         tokensUsed: result.limits?.usage?.count || 0,
                     };
@@ -149,7 +154,7 @@ export async function POST(request: NextRequest) {
 
                     await prisma.image.update({
                         where: { id: image.id },
-                        data: updateData,
+                        data: updateData as Record<string, unknown>,
                     });
                 }
             } catch (dbError) {
