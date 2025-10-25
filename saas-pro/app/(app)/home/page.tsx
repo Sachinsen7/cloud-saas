@@ -19,7 +19,7 @@ import Link from 'next/link';
 const Home = () => {
     const [videos, setVideos] = useState<Video[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<unknown>(null);
 
     const fetchVideos = useCallback(async () => {
         try {
@@ -106,6 +106,40 @@ const Home = () => {
                 {loading ? (
                     <div className="flex justify-center items-center min-h-[200px]">
                         <div className="loading loading-spinner loading-lg"></div>
+                    </div>
+                ) : error ? (
+                    <div className="text-center py-12 bg-red-50 rounded-2xl">
+                        <div className="text-red-500 mb-4">
+                            <svg
+                                className="w-16 h-16 mx-auto mb-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                                aria-label="Error icon"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        </div>
+                        <h3 className="text-xl font-semibold text-red-600 mb-2">
+                            Error loading videos
+                        </h3>
+                        <p className="text-red-500 mb-4">
+                            {error instanceof Error
+                                ? error.message
+                                : 'Failed to load videos'}
+                        </p>
+                        <button
+                            onClick={() => {
+                                setError(null);
+                                fetchVideos();
+                            }}
+                            className="btn btn-primary"
+                        >
+                            Try Again
+                        </button>
                     </div>
                 ) : videos.length === 0 ? (
                     <div className="text-center py-12 bg-gray-50 rounded-2xl">
