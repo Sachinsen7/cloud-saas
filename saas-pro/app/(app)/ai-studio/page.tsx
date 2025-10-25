@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CldImage } from 'next-cloudinary';
+
 import {
     Wand2,
     Scissors,
@@ -22,7 +22,11 @@ interface ProcessedImage {
     extractedText?: string;
     hasBackgroundRemoved: boolean;
     isEnhanced: boolean;
-    processedData?: any;
+    processedData?: {
+        watermarkDetected?: string;
+        objectDetection?: Array<{ object: string; confidence: number }>;
+        [key: string]: string | number | boolean | Array<unknown> | Record<string, unknown> | null | undefined;
+    };
     originalUrl?: string;
     processedUrl?: string;
 }
@@ -175,11 +179,13 @@ export default function AIStudio() {
                 .catch(error => {
                     console.error('Download failed:', error);
                     // Fallback to direct link
-                    const link = document.createElement('a');
-                    link.href = processedImage.processedUrl;
-                    link.download = `${processedImage.title}_processed.png`;
-                    link.target = '_blank';
-                    link.click();
+                    if (processedImage.processedUrl) {
+                        const link = document.createElement('a');
+                        link.href = processedImage.processedUrl;
+                        link.download = `${processedImage.title}_processed.png`;
+                        link.target = '_blank';
+                        link.click();
+                    }
                 });
         }
     };
@@ -343,7 +349,7 @@ export default function AIStudio() {
                         {processedImage && (
                             <div className="space-y-4">
                                 {/* Processed Images */}
-                                {processedImage.processedUrl && (
+                                {processedImage.processedUrl && typeof processedImage.processedUrl === 'string' && (
                                     <div>
                                         <h3 className="font-semibold mb-2">
                                             Processed Image:
@@ -363,7 +369,7 @@ export default function AIStudio() {
                                                     className="btn btn-sm btn-primary"
                                                     onClick={() => {
                                                         const link = document.createElement('a');
-                                                        link.href = processedImage.processedUrl;
+                                                        link.href = processedImage.processedUrl!;
                                                         link.download = `${processedImage.title}_bg_removed.png`;
                                                         link.target = '_blank';
                                                         link.rel = 'noopener noreferrer';
@@ -378,12 +384,12 @@ export default function AIStudio() {
                                             </div>
 
                                             {/* Fine Edges Background Removal */}
-                                            {processedImage.processedData?.fineEdgesUrl && (
+                                            {processedImage.processedData?.fineEdgesUrl && typeof processedImage.processedData.fineEdgesUrl === 'string' && (
                                                 <div className="bg-white p-3 rounded-lg border">
                                                     <h4 className="font-medium mb-2">Fine Edges (Better Quality)</h4>
                                                     <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-2">
                                                         <img
-                                                            src={processedImage.processedData.fineEdgesUrl}
+                                                            src={processedImage.processedData.fineEdgesUrl as string}
                                                             alt="Background Removed - Fine Edges"
                                                             className="w-full h-full object-contain"
                                                         />
@@ -392,7 +398,7 @@ export default function AIStudio() {
                                                         className="btn btn-sm btn-secondary"
                                                         onClick={() => {
                                                             const link = document.createElement('a');
-                                                            link.href = processedImage.processedData.fineEdgesUrl;
+                                                            link.href = processedImage.processedData?.fineEdgesUrl as string;
                                                             link.download = `${processedImage.title}_fine_edges.png`;
                                                             link.click();
                                                         }}
@@ -454,14 +460,14 @@ export default function AIStudio() {
                                     )}
 
                                 {/* AI Caption */}
-                                {processedImage.processedData?.aiCaption && (
+                                {processedImage.processedData?.aiCaption && typeof processedImage.processedData.aiCaption === 'string' && (
                                     <div>
                                         <h3 className="font-semibold mb-2">AI Caption:</h3>
                                         <div className="bg-blue-50 p-4 rounded-lg">
                                             <p className="text-sm">{processedImage.processedData.aiCaption}</p>
                                             <button
                                                 className="btn btn-sm btn-outline mt-2"
-                                                onClick={() => copyToClipboard(processedImage.processedData.aiCaption)}
+                                                onClick={() => copyToClipboard(processedImage.processedData?.aiCaption as string)}
                                             >
                                                 <Copy className="w-4 h-4" />
                                                 Copy Caption
@@ -471,20 +477,20 @@ export default function AIStudio() {
                                 )}
 
                                 {/* Quality Analysis */}
-                                {processedImage.processedData?.qualityScore !== undefined && (
+                                {processedImage.processedData?.qualityScore !== undefined && typeof processedImage.processedData.qualityScore === 'number' && (
                                     <div>
                                         <h3 className="font-semibold mb-2">Quality Analysis:</h3>
                                         <div className="bg-orange-50 p-4 rounded-lg">
                                             <div className="flex items-center gap-4">
                                                 <div>
-                                                    <p className="text-sm font-medium">Score: {(processedImage.processedData.qualityScore * 100).toFixed(1)}%</p>
-                                                    <p className="text-sm">Level: <span className="capitalize">{processedImage.processedData.qualityLevel}</span></p>
+                                                    <p className="text-sm font-medium">Score: {((processedImage.processedData.qualityScore as number) * 100).toFixed(1)}%</p>
+                                                    <p className="text-sm">Level: <span className="capitalize">{processedImage.processedData.qualityLevel as string}</span></p>
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="w-full bg-gray-200 rounded-full h-2">
                                                         <div
                                                             className="bg-orange-500 h-2 rounded-full"
-                                                            style={{ width: `${processedImage.processedData.qualityScore * 100}%` }}
+                                                            style={{ width: `${(processedImage.processedData.qualityScore as number) * 100}%` }}
                                                         ></div>
                                                     </div>
                                                 </div>
@@ -494,7 +500,7 @@ export default function AIStudio() {
                                 )}
 
                                 {/* Watermark Detection */}
-                                {processedImage.processedData?.watermarkDetected && (
+                                {processedImage.processedData?.watermarkDetected && typeof processedImage.processedData.watermarkDetected === 'string' && (
                                     <div>
                                         <h3 className="font-semibold mb-2">Watermark Detection:</h3>
                                         <div className="bg-pink-50 p-4 rounded-lg">
@@ -509,12 +515,12 @@ export default function AIStudio() {
                                 )}
 
                                 {/* Object Detection */}
-                                {processedImage.processedData?.objectDetection && processedImage.processedData.objectDetection.length > 0 && (
+                                {processedImage.processedData?.objectDetection && Array.isArray(processedImage.processedData.objectDetection) && processedImage.processedData.objectDetection.length > 0 && (
                                     <div>
                                         <h3 className="font-semibold mb-2">Detected Objects:</h3>
                                         <div className="bg-teal-50 p-4 rounded-lg">
                                             <div className="space-y-2">
-                                                {processedImage.processedData.objectDetection.slice(0, 5).map((obj: any, index: number) => (
+                                                {processedImage.processedData.objectDetection.slice(0, 5).map((obj: { object: string; confidence: number }, index: number) => (
                                                     <div key={index} className="flex justify-between items-center">
                                                         <span className="text-sm font-medium capitalize">{obj.object}</span>
                                                         <span className="text-xs text-gray-500">{(obj.confidence * 100).toFixed(1)}%</span>
