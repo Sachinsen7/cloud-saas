@@ -42,7 +42,11 @@ export async function POST(request: NextRequest) {
         ).toString('base64');
 
         let endpoint = '';
-        let payload: any = {
+        const payload: {
+            source: { uri: string };
+            tag_definitions?: Array<{ name: string; description: string }>;
+            prompt?: string;
+        } = {
             source: { uri: imageUrl },
         };
 
@@ -113,7 +117,11 @@ export async function POST(request: NextRequest) {
                 });
 
                 if (image) {
-                    let updateData: any = {
+                    let updateData: {
+                        tags?: string[];
+                        aiCaption?: string;
+                        objectDetection?: unknown;
+                    } = {
                         tokensUsed: result.limits?.usage?.count || 0,
                     };
 
