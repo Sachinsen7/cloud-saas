@@ -21,7 +21,7 @@ export async function GET() {
             },
             database: {
                 status: 'unknown',
-                error: null,
+                error: null as string | null,
             },
         };
 
