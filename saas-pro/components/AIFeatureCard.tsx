@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -20,7 +19,6 @@ const AI_FEATURES = [
         color: 'text-red-500',
         bgColor: 'bg-red-50',
         example: 'Perfect for profile photos and Product images',
-
     },
     {
         id: 'ocr',
@@ -109,7 +107,6 @@ const AI_FEATURES = [
 export default function AIFeatureShowcase() {
     return (
         <div className="  p-6 shadow-md ">
-
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold mb-4 bg-[#5754e8] bg-clip-text text-transparent">
                     AI-Powered Image Processing
@@ -155,6 +152,6 @@ export default function AIFeatureShowcase() {
                     <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
             </div>
-        </div >
+        </div>
     );
 }
