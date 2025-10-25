@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CldImage } from 'next-cloudinary';
+
 import {
     Users,
     Eye,
-    Smile,
+
     Scissors,
     Upload,
     Download,
@@ -21,12 +21,22 @@ interface ProcessedFaceImage {
     publicId: string;
     faceCount: number;
     hasFaces: boolean;
-    facialAttributes?: any[];
-    facesBoundingBoxes?: any[];
-    facialLandmarks?: any[];
-    faceDetectionData?: any;
+    facialAttributes?: Array<{
+        [key: string]: unknown;
+    }>;
+    facesBoundingBoxes?: Array<{
+        [key: string]: unknown;
+    }>;
+    facialLandmarks?: Array<{
+        [key: string]: unknown;
+    }>;
+    faceDetectionData?: {
+        [key: string]: unknown;
+    };
     originalUrl?: string;
-    processedUrls?: any;
+    processedUrls?: {
+        [key: string]: unknown;
+    };
 }
 
 const FACE_FEATURES = [
@@ -137,7 +147,7 @@ export default function FaceStudio() {
         (f) => f.id === selectedFeature
     );
 
-    const renderFaceAttributes = (attributes: any[]) => {
+    const renderFaceAttributes = (attributes: Array<{ [key: string]: unknown }>) => {
         if (!attributes || attributes.length === 0) return null;
 
         return (
