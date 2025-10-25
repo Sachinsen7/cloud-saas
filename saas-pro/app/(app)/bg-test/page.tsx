@@ -5,7 +5,7 @@ import { Download } from "lucide-react";
 
 export default function BackgroundRemovalTest() {
     const [testImageUrl, setTestImageUrl] = useState("");
-    const [processedUrls, setProcessedUrls] = useState<any>({});
+    const [processedUrls, setProcessedUrls] = useState<Record<string, string>>({});
 
     const testImages = [
         {
@@ -179,7 +179,7 @@ export default function BackgroundRemovalTest() {
                 <div>
                     <h3 className="font-bold">Updated Method:</h3>
                     <p className="mt-2">
-                        We're now using <code>e_background_removal</code> instead of the deprecated <code>background: "remove"</code> method.
+                        We&apos;re now using <code>e_background_removal</code> instead of the deprecated <code>background: &quot;remove&quot;</code> method.
                         This should provide better results and proper PNG format with transparency.
                     </p>
                 </div>
