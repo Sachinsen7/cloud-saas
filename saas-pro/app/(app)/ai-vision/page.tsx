@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CldImage } from 'next-cloudinary';
+
 import {
     Brain,
     Tags,
     Shield,
     MessageSquare,
-    Upload,
     Eye,
     Plus,
     Minus,
@@ -24,7 +23,15 @@ interface TagDefinition {
 
 interface AIVisionResult {
     mode: string;
-    data: any;
+    data: {
+        tags?: Array<{ name: string; confidence: number }>;
+        responses?: Array<{
+            text: string;
+            value: string;
+            prompt?: string;
+        }>;
+        [key: string]: unknown;
+    };
     tokensUsed: number;
 }
 
@@ -157,7 +164,13 @@ export default function AIVision() {
         setIsProcessing(true);
 
         try {
-            let requestData: any = {
+            const requestData: {
+                mode: string;
+                imageUrl: string;
+                tagDefinitions?: TagDefinition[];
+                rejectionQuestions?: string[];
+                prompts?: string[];
+            } = {
                 mode: selectedMode,
                 imageUrl: previewUrl,
             };
@@ -528,7 +541,10 @@ export default function AIVision() {
                                             <div className="flex flex-wrap gap-2">
                                                 {results.data.tags.map(
                                                     (
-                                                        tag: any,
+                                                        tag: {
+                                                            name: string;
+                                                            confidence: number;
+                                                        },
                                                         index: number
                                                     ) => (
                                                         <span
@@ -558,7 +574,11 @@ export default function AIVision() {
                                             <div className="space-y-2">
                                                 {results.data.responses.map(
                                                     (
-                                                        response: any,
+                                                        response: {
+                                                            text: string;
+                                                            value: string;
+                                                            prompt?: string;
+                                                        },
                                                         index: number
                                                     ) => (
                                                         <div
@@ -616,7 +636,9 @@ export default function AIVision() {
                                             <div className="space-y-4">
                                                 {results.data.responses.map(
                                                     (
-                                                        response: any,
+                                                        response: {
+                                                            value: string;
+                                                        },
                                                         index: number
                                                     ) => (
                                                         <div

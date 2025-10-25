@@ -15,7 +15,7 @@ interface CloudinaryUploadResponse {
     public_id: string;
     bytes: number;
     format: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export async function POST(request: NextRequest) {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         );
 
         // Process based on type
-        let processedData: any = {};
+        let processedData: Record<string, unknown> = {};
 
         switch (processType) {
             case 'background-removal':
@@ -105,23 +105,46 @@ export async function POST(request: NextRequest) {
                 publicId: uploadResult.public_id,
                 originalSize: uploadResult.bytes.toString(),
                 fileType: uploadResult.format,
-                tags: processedData.tags || [],
-                extractedText: processedData.extractedText || null,
+                tags: Array.isArray(processedData.tags)
+                    ? (processedData.tags as string[])
+                    : [],
+                extractedText:
+                    typeof processedData.extractedText === 'string'
+                        ? processedData.extractedText
+                        : null,
                 hasBackgroundRemoved: processType === 'background-removal',
                 isEnhanced: processType === 'enhance',
-                aiCaption: processedData.aiCaption || null,
-                qualityScore: processedData.qualityScore || null,
-                qualityLevel: processedData.qualityLevel || null,
-                watermarkDetected: processedData.watermarkDetected || null,
+                aiCaption:
+                    typeof processedData.aiCaption === 'string'
+                        ? processedData.aiCaption
+                        : null,
+                qualityScore:
+                    typeof processedData.qualityScore === 'number'
+                        ? processedData.qualityScore
+                        : null,
+                qualityLevel:
+                    typeof processedData.qualityLevel === 'string'
+                        ? processedData.qualityLevel
+                        : null,
+                watermarkDetected:
+                    typeof processedData.watermarkDetected === 'string'
+                        ? processedData.watermarkDetected
+                        : null,
                 objectDetection: {
                     processType: processType,
                     processedUrls: {
-                        processedUrl: processedData.processedUrl,
-                        fineEdgesUrl: processedData.fineEdgesUrl || null
+                        processedUrl:
+                            typeof processedData.processedUrl === 'string'
+                                ? processedData.processedUrl
+                                : null,
+                        fineEdgesUrl:
+                            typeof processedData.fineEdgesUrl === 'string'
+                                ? processedData.fineEdgesUrl
+                                : null,
                     },
                     processedAt: new Date().toISOString(),
-                    originalData: processedData.objectDetection || null
-                } as any,
+                    originalData: processedData.objectDetection || null,
+                },
             },
         });
 
@@ -147,7 +170,7 @@ async function processBackgroundRemoval(publicId: string) {
             effect: 'background_removal',
             format: 'png',
             sign_url: true,
-            type: 'upload'
+            type: 'upload',
         });
 
         // Also create a version with fine edges for better quality
@@ -155,7 +178,7 @@ async function processBackgroundRemoval(publicId: string) {
             effect: 'background_removal:fineedges_y',
             format: 'png',
             sign_url: true,
-            type: 'upload'
+            type: 'upload',
         });
 
         return {
@@ -166,7 +189,12 @@ async function processBackgroundRemoval(publicId: string) {
         };
     } catch (error) {
         console.error('Background removal error:', error);
-        return { processedUrl: null, fineEdgesUrl: null, tags: [], type: 'background-removal' };
+        return {
+            processedUrl: null,
+            fineEdgesUrl: null,
+            tags: [],
+            type: 'background-removal',
+        };
     }
 }
 
@@ -211,7 +239,8 @@ async function processAutoTag(publicId: string) {
         const detectedObjects = [];
         for (const [model, data] of Object.entries(detectionData)) {
             if (data && typeof data === 'object' && 'tags' in data) {
-                const modelTags = (data as any).tags;
+                const modelTags = (data as { tags: Record<string, unknown> })
+                    .tags;
                 for (const [objectName, detections] of Object.entries(
                     modelTags
                 )) {
@@ -241,7 +270,7 @@ async function processEnhancement(publicId: string) {
             quality: 'auto:best',
             format: 'auto',
             sign_url: true,
-            type: 'upload'
+            type: 'upload',
         });
 
         return {
@@ -272,7 +301,7 @@ async function processImageQuality(publicId: string) {
 
         const qualityData =
             result.info?.detection?.object_detection?.data?.iqa?.tags?.[
-            'iqa-analysis'
+                'iqa-analysis'
             ]?.[0];
 
         return {
@@ -372,18 +401,25 @@ async function processAdvancedObjectDetection(publicId: string) {
 
         for (const [model, data] of Object.entries(detectionData)) {
             if (data && typeof data === 'object' && 'tags' in data) {
-                const modelTags = (data as any).tags;
+                const modelTags = (data as { tags: Record<string, unknown> })
+                    .tags;
                 for (const [objectName, detections] of Object.entries(
                     modelTags
                 )) {
                     if (Array.isArray(detections)) {
                         detectedObjects.push(
-                            ...detections.map((detection: any) => ({
-                                object: objectName,
-                                confidence: detection.confidence,
-                                boundingBox: detection['bounding-box'],
-                                model: model,
-                            }))
+                            ...detections.map(
+                                (detection: {
+                                    confidence: number;
+                                    [key: string]: unknown;
+                                }) => ({
+                                    object: objectName,
+                                    confidence: detection.confidence,
+                                    boundingBox:
+                                        detection['bounding-box'] || null,
+                                    model: model,
+                                })
+                            )
                         );
                     }
                 }
@@ -404,4 +440,3 @@ async function processAdvancedObjectDetection(publicId: string) {
         };
     }
 }
-

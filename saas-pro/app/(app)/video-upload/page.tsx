@@ -46,12 +46,12 @@ export default function Video() {
             setTimeout(() => {
                 router.push('/videos');
             }, 1500);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error uploading video:', error);
             setError(
-                error.response?.data ||
-                    error.message ||
-                    'Failed to upload video'
+                (error as { response?: { data?: string }; message?: string }).response?.data ||
+                (error as { message?: string }).message ||
+                'Failed to upload video'
             );
         } finally {
             setIsUploading(false);

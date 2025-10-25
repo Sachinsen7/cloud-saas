@@ -6,11 +6,11 @@ import {
     Upload,
     Download,
     Eye,
-    Trash2,
+
     Clock,
     CheckCircle,
     XCircle,
-    FileImage,
+
     FileText as FilePdf,
 } from 'lucide-react';
 
@@ -410,16 +410,16 @@ export default function DocumentStudio() {
                                                 <div className="flex gap-2">
                                                     {doc.conversionStatus ===
                                                         'complete' && (
-                                                        <button
-                                                            className="btn btn-sm btn-primary"
-                                                            onClick={() =>
-                                                                downloadPDF(doc)
-                                                            }
-                                                            title="Download PDF"
-                                                        >
-                                                            <FilePdf className="w-4 h-4" />
-                                                        </button>
-                                                    )}
+                                                            <button
+                                                                className="btn btn-sm btn-primary"
+                                                                onClick={() =>
+                                                                    downloadPDF(doc)
+                                                                }
+                                                                title="Download PDF"
+                                                            >
+                                                                <FilePdf className="w-4 h-4" />
+                                                            </button>
+                                                        )}
                                                     <button
                                                         className="btn btn-sm btn-outline"
                                                         onClick={() =>
@@ -537,16 +537,16 @@ export default function DocumentStudio() {
                         <div className="modal-action">
                             {selectedDocument.conversionStatus ===
                                 'complete' && (
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() =>
-                                        downloadPDF(selectedDocument)
-                                    }
-                                >
-                                    <FilePdf className="w-4 h-4" />
-                                    Download PDF
-                                </button>
-                            )}
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={() =>
+                                            downloadPDF(selectedDocument)
+                                        }
+                                    >
+                                        <FilePdf className="w-4 h-4" />
+                                        Download PDF
+                                    </button>
+                                )}
                             <button
                                 className="btn btn-outline"
                                 onClick={() =>

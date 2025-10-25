@@ -15,7 +15,7 @@ interface CloudinaryUploadResponse {
     public_id: string;
     bytes: number;
     format: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 const SUPPORTED_FORMATS = [

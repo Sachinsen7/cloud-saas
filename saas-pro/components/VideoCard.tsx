@@ -4,7 +4,7 @@ import { getCldOgImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { filesize } from 'filesize';
-import { Video } from '@/generated/prisma';
+
 
 dayjs.extend(relativeTime);
 
