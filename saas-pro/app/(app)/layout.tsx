@@ -38,6 +38,7 @@ export default function AppLayout({
     children: React.ReactNode;
 }>) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
     const { user } = useUser();
@@ -47,9 +48,13 @@ export default function AppLayout({
         router.push('/');
     };
 
-    const handleSignOut = async () => {
-        await signOut();
+    const handleSignOut = () => {
+        signOut();
+        setShowLogoutConfirm(false);
+
+        router.push("/");
     };
+
 
     return (
         <div className="drawer lg:drawer-open">
@@ -99,16 +104,53 @@ export default function AppLayout({
                                             user.emailAddresses[0].emailAddress}
                                     </span>
                                     <button
-                                        onClick={handleSignOut}
+                                        onClick={() => setShowLogoutConfirm(true)}
                                         className="btn btn-ghost btn-circle"
                                     >
                                         <LogOutIcon className="h-6 w-6" />
                                     </button>
+
                                 </>
                             )}
                         </div>
                     </div>
                 </header>
+                   {showLogoutConfirm && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50 p-4 backdrop-blur-sm">
+                    <div
+                        className={` text-white p-8 rounded-xl shadow-4xl flex flex-col items-center gap-6 max-w-sm w-full border border-gray-700/50`}
+                    >
+                        <svg
+                            className="w-10 h-10 text-[#3d3ae9] mb-2"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                        >
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"></path>
+                        </svg>
+
+                        <p className="text-xl font-medium text-center">
+                            Are you sure you want to log out?
+                        </p>
+
+                        <div className="flex gap-4 w-full">
+                            <button
+                                onClick={handleSignOut}
+                                className="flex-1 px-4 py-3 bg-[#4a47ec] text-white font-semibold rounded-lg hover:bg-[#5451e8] transition "
+                            >
+                                Yes, Logout
+                            </button>
+                            <button
+                                onClick={() => setShowLogoutConfirm(false)}
+                                className="flex-1 px-4 py-3 bg-[#3d3ae9] text-gray-300 font-semibold rounded-lg hover:bg-[#5451e8] transition"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
                 {/* Page content */}
                 <main className="flex-grow">
                     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 my-8">
@@ -145,7 +187,7 @@ export default function AppLayout({
                     {user && (
                         <div className="p-4">
                             <button
-                                onClick={handleSignOut}
+                                  onClick={() => setShowLogoutConfirm(true)}
                                 className="btn btn-outline btn-error w-full"
                             >
                                 <LogOutIcon className="mr-2 h-5 w-5" />
