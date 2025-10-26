@@ -2,8 +2,16 @@
 
 import { useEffect, useState } from 'react';
 
+interface ComputedStyles {
+    primary?: string;
+    primaryHSL?: string;
+    primaryContent?: string;
+    theme?: string | null;
+    rawPrimary?: string;
+}
+
 export default function DebugColors() {
-    const [computedStyles, setComputedStyles] = useState<any>({});
+    const [computedStyles, setComputedStyles] = useState<ComputedStyles>({});
 
     useEffect(() => {
         // Get computed CSS variables
@@ -37,7 +45,7 @@ export default function DebugColors() {
             <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Test Buttons</h2>
                 <div className="flex gap-4 flex-wrap">
-                    <button className="btn btn-primary">Primary Button (Should be Black)</button>
+                    <button className="btn btn-primary">Primary Button (Should be Purple-Blue)</button>
                     <button className="btn btn-secondary">Secondary Button</button>
                     <button className="btn btn-accent">Accent Button</button>
                 </div>
@@ -50,7 +58,7 @@ export default function DebugColors() {
                     <div className="card bg-primary text-primary-content">
                         <div className="card-body">
                             <h3 className="card-title">Primary Card</h3>
-                            <p>This should have a black background with white text</p>
+                            <p>This should have a purple-blue background with white text</p>
                         </div>
                     </div>
                     <div className="card bg-base-100 shadow-xl">
@@ -78,9 +86,9 @@ export default function DebugColors() {
                 <h2 className="text-xl font-semibold">Raw CSS Test</h2>
                 <div
                     className="p-4 rounded-lg text-white"
-                    style={{ backgroundColor: '#111111' }}
+                    style={{ backgroundColor: '#3448C5' }}
                 >
-                    This div has inline style backgroundColor: #111111 (should be black)
+                    This div has inline style backgroundColor: #3448C5 (should be purple-blue)
                 </div>
                 <div
                     className="p-4 rounded-lg"
