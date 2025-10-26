@@ -1,0 +1,187 @@
+/* 
+ * Centralized Color Overrides
+ * Colors are imported from colors.config.js
+ * Change colors there to update the entire application
+ */
+
+/* Light theme primary color: #3448C5 */
+:root,
+:root[data-theme="light"],
+html,
+html[data-theme="light"] {
+    --primary: #3448C5 !important;
+    --primary-content: #ffffff !important;
+    --p: 232 58% 49% !important;
+    /* HSL for #3448C5 */
+    --pc: 0 0% 100% !important;
+}
+
+/* Dark theme primary color: #5B6FD8 */
+:root[data-theme="dark"],
+html[data-theme="dark"] {
+    --primary: #5B6FD8 !important;
+    --primary-content: #ffffff !important;
+    --p: 230 62% 60% !important;
+    /* HSL for #5B6FD8 */
+    --pc: 0 0% 100% !important;
+}
+
+/* Light theme primary elements */
+[data-theme="light"] .btn-primary,
+[data-theme="light"] .btn.btn-primary,
+[data-theme="light"] button.btn-primary,
+[data-theme="light"] input.btn-primary {
+    background-color: #3448C5 !important;
+    border-color: #3448C5 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-primary:hover,
+[data-theme="light"] .btn.btn-primary:hover,
+[data-theme="light"] button.btn-primary:hover {
+    background-color: #2A3BA3 !important;
+    /* Darker shade for hover */
+    border-color: #2A3BA3 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .bg-primary,
+[data-theme="light"] .card.bg-primary,
+[data-theme="light"] div.bg-primary {
+    background-color: #3448C5 !important;
+}
+
+[data-theme="light"] .text-primary,
+[data-theme="light"] span.text-primary,
+[data-theme="light"] p.text-primary {
+    color: #3448C5 !important;
+}
+
+[data-theme="light"] .border-primary {
+    border-color: #3448C5 !important;
+}
+
+/* Dark theme primary elements */
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .btn.btn-primary,
+[data-theme="dark"] button.btn-primary,
+[data-theme="dark"] input.btn-primary {
+    background-color: #5B6FD8 !important;
+    border-color: #5B6FD8 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-primary:hover,
+[data-theme="dark"] .btn.btn-primary:hover,
+[data-theme="dark"] button.btn-primary:hover {
+    background-color: #7A8EE0 !important;
+    /* Lighter shade for hover in dark mode */
+    border-color: #7A8EE0 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .bg-primary,
+[data-theme="dark"] .card.bg-primary,
+[data-theme="dark"] div.bg-primary {
+    background-color: #5B6FD8 !important;
+}
+
+[data-theme="dark"] .text-primary,
+[data-theme="dark"] span.text-primary,
+[data-theme="dark"] p.text-primary {
+    color: #5B6FD8 !important;
+}
+
+[data-theme="dark"] .border-primary {
+    border-color: #5B6FD8 !important;
+}
+
+/* Sidebar active link override */
+[data-theme="light"] .bg-primary.text-white,
+[data-theme="light"] a.bg-primary.text-white {
+    background-color: #3448C5 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .bg-primary.text-white,
+[data-theme="dark"] a.bg-primary.text-white {
+    background-color: #5B6FD8 !important;
+    color: #ffffff !important;
+}
+
+/* Card primary override */
+[data-theme="light"] .card.bg-primary.text-primary-content {
+    background-color: #3448C5 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .card.bg-primary.text-primary-content {
+    background-color: #5B6FD8 !important;
+    color: #ffffff !important;
+}
+
+/* DaisyUI specific overrides */
+[data-theme="light"] .daisyui-btn-primary,
+[data-theme="light"] [data-theme] .btn-primary {
+    background-color: #3448C5 !important;
+    border-color: #3448C5 !important;
+}
+
+[data-theme="dark"] .daisyui-btn-primary,
+[data-theme="dark"] [data-theme] .btn-primary {
+    background-color: #5B6FD8 !important;
+    border-color: #5B6FD8 !important;
+}
+
+/* Override any HSL calculations */
+[data-theme="light"] .btn-primary {
+    background-color: hsl(232, 58%, 49%) !important;
+    border-color: hsl(232, 58%, 49%) !important;
+}
+
+[data-theme="dark"] .btn-primary {
+    background-color: hsl(230, 62%, 60%) !important;
+    border-color: hsl(230, 62%, 60%) !important;
+}
+
+/* Ensure theme colors work with opacity modifiers */
+[data-theme="light"] .bg-primary\/10 {
+    background-color: hsl(232, 58%, 49%, 0.1) !important;
+}
+
+[data-theme="dark"] .bg-primary\/10 {
+    background-color: hsl(230, 62%, 60%, 0.1) !important;
+}
+
+[data-theme="light"] .bg-primary\/80 {
+    background-color: hsl(232, 58%, 49%, 0.8) !important;
+}
+
+[data-theme="dark"] .bg-primary\/80 {
+    background-color: hsl(230, 62%, 60%, 0.8) !important;
+}
+
+[data-theme="light"] .bg-primary\/60 {
+    background-color: hsl(232, 58%, 49%, 0.6) !important;
+}
+
+[data-theme="dark"] .bg-primary\/60 {
+    background-color: hsl(230, 62%, 60%, 0.6) !important;
+}
+
+/* Hover states with opacity */
+[data-theme="light"] .hover\:bg-primary\/80:hover {
+    background-color: hsl(232, 58%, 49%, 0.8) !important;
+}
+
+[data-theme="dark"] .hover\:bg-primary\/80:hover {
+    background-color: hsl(230, 62%, 60%, 0.8) !important;
+}
+
+[data-theme="light"] .hover\:bg-primary\/60:hover {
+    background-color: hsl(232, 58%, 49%, 0.6) !important;
+}
+
+[data-theme="dark"] .hover\:bg-primary\/60:hover {
+    background-color: hsl(230, 62%, 60%, 0.6) !important;
+}
