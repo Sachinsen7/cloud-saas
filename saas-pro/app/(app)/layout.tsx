@@ -19,6 +19,7 @@ import {
     UsersIcon,
 } from 'lucide-react';
 
+
 const sidebarItems = [
     { href: '/home', icon: LayoutDashboardIcon, label: 'Home Page' },
     { href: '/videos', icon: ImageIcon, label: 'Videos' },
@@ -30,6 +31,9 @@ const sidebarItems = [
     { href: '/face-studio', icon: UsersIcon, label: 'Face Studio' },
     { href: '/document-studio', icon: FileTextIcon, label: 'Document Studio' },
     { href: '/bg-test', icon: Wand2Icon, label: 'BG Test' },
+    { href: '/color-test', icon: ImageIcon, label: 'Color Test' },
+    { href: '/debug-colors', icon: ImageIcon, label: 'Debug Colors' },
+    { href: '/simple-test', icon: ImageIcon, label: 'Simple Test' },
 ];
 
 export default function AppLayout({
@@ -115,42 +119,42 @@ export default function AppLayout({
                         </div>
                     </div>
                 </header>
-                   {showLogoutConfirm && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50 p-4 backdrop-blur-sm">
-                    <div
-                        className={` text-white p-8 rounded-xl shadow-4xl flex flex-col items-center gap-6 max-w-sm w-full border border-gray-700/50`}
-                    >
-                        <svg
-                            className="w-10 h-10 text-[#3d3ae9] mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
+                {showLogoutConfirm && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50 p-4 backdrop-blur-sm">
+                        <div
+                            className={` text-white p-8 rounded-xl shadow-4xl flex flex-col items-center gap-6 max-w-sm w-full border border-gray-700/50`}
                         >
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"></path>
-                        </svg>
-
-                        <p className="text-xl font-medium text-center">
-                            Are you sure you want to log out?
-                        </p>
-
-                        <div className="flex gap-4 w-full">
-                            <button
-                                onClick={handleSignOut}
-                                className="flex-1 px-4 py-3 bg-[#4a47ec] text-white font-semibold rounded-lg hover:bg-[#5451e8] transition "
+                            <svg
+                                className="w-10 h-10 text-primary mb-2"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
                             >
-                                Yes, Logout
-                            </button>
-                            <button
-                                onClick={() => setShowLogoutConfirm(false)}
-                                className="flex-1 px-4 py-3 bg-[#3d3ae9] text-gray-300 font-semibold rounded-lg hover:bg-[#5451e8] transition"
-                            >
-                                Cancel
-                            </button>
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"></path>
+                            </svg>
+
+                            <p className="text-xl font-medium text-center">
+                                Are you sure you want to log out?
+                            </p>
+
+                            <div className="flex gap-4 w-full">
+                                <button
+                                    onClick={handleSignOut}
+                                    className="flex-1 px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/80 transition"
+                                >
+                                    Yes, Logout
+                                </button>
+                                <button
+                                    onClick={() => setShowLogoutConfirm(false)}
+                                    className="flex-1 px-4 py-3 bg-primary/80 text-gray-300 font-semibold rounded-lg hover:bg-primary/60 transition"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
                 {/* Page content */}
                 <main className="flex-grow">
                     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 my-8">
@@ -187,7 +191,7 @@ export default function AppLayout({
                     {user && (
                         <div className="p-4">
                             <button
-                                  onClick={() => setShowLogoutConfirm(true)}
+                                onClick={() => setShowLogoutConfirm(true)}
                                 className="btn btn-outline btn-error w-full"
                             >
                                 <LogOutIcon className="mr-2 h-5 w-5" />
