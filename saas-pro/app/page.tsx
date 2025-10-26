@@ -33,6 +33,7 @@ export default function Home() {
                     <button
                         onClick={goToLogin}
                         className={`
+                            cursor-pointer
               py-1 px-8 text-xl font-bold uppercase rounded-md 
               bg-[#312ed9]  text-white 
               outline-none
@@ -47,7 +48,7 @@ export default function Home() {
                         onClick={goToSignup}
                         className={`
               py-3 px-7 text-xl font-bold uppercase rounded-md 
-              bg-red-500
+              bg-red-500 cursor-pointer
              outline-none text-white
               border border-none hover:bg-red-400
             `}
