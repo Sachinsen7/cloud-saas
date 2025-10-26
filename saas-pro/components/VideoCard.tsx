@@ -87,8 +87,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
             <figure className="aspect-video relative">
                 {isHovered ? (
                     previewError ? (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                            <p className="text-red-500">
+                        <div className="w-full h-full flex items-center justify-center bg-base-200">
+                            <p className="text-error">
                                 Preview not available
                             </p>
                         </div>
