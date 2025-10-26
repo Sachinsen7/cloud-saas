@@ -1,9 +1,54 @@
 @import 'tailwindcss';
 @plugin "daisyui";
+@import './force-colors.css';
 
 :root {
     --background: #ffffff;
     --foreground: #171717;
+
+    /* DaisyUI CSS Variables - Light Theme - Now using #3448C5 */
+    --primary: #3448C5;
+    --primary-content: #ffffff;
+    --secondary: #f59e0b;
+    --secondary-content: #ffffff;
+    --accent: #10b981;
+    --accent-content: #ffffff;
+    --neutral: #374151;
+    --neutral-content: #ffffff;
+    --base-100: #ffffff;
+    --base-200: #f3f4f6;
+    --base-300: #e5e7eb;
+    --base-content: #1f2937;
+    --info: #3b82f6;
+    --info-content: #ffffff;
+    --success: #10b981;
+    --success-content: #ffffff;
+    --warning: #f59e0b;
+    --warning-content: #ffffff;
+    --error: #ef4444;
+    --error-content: #ffffff;
+
+    /* DaisyUI HSL Variables - Updated for #3448C5 */
+    --p: 232 58% 49%;
+    --pc: 0 0% 100%;
+    --s: 38 92% 50%;
+    --sc: 0 0% 100%;
+    --a: 158 64% 52%;
+    --ac: 0 0% 100%;
+    --n: 220 13% 28%;
+    --nc: 0 0% 100%;
+    --b1: 0 0% 100%;
+    --b2: 220 13% 95%;
+    --b3: 220 13% 91%;
+    --bc: 220 13% 15%;
+    --in: 221 83% 53%;
+    --inc: 0 0% 100%;
+    --su: 158 64% 52%;
+    --suc: 0 0% 100%;
+    --wa: 38 92% 50%;
+    --wac: 0 0% 100%;
+    --er: 4 90% 58%;
+    --erc: 0 0% 100%;
 }
 
 @theme inline {
@@ -17,6 +62,50 @@
     :root {
         --background: #0a0a0a;
         --foreground: #ededed;
+
+        /* DaisyUI CSS Variables - Dark Theme - Now using #5B6FD8 */
+        --primary: #5B6FD8;
+        --primary-content: #ffffff;
+        --secondary: #fbbf24;
+        --secondary-content: #1e293b;
+        --accent: #34d399;
+        --accent-content: #1e293b;
+        --neutral: #6b7280;
+        --neutral-content: #f9fafb;
+        --base-100: #1f2937;
+        --base-200: #374151;
+        --base-300: #4b5563;
+        --base-content: #f9fafb;
+        --info: #60a5fa;
+        --info-content: #1e293b;
+        --success: #34d399;
+        --success-content: #1e293b;
+        --warning: #fbbf24;
+        --warning-content: #1e293b;
+        --error: #f87171;
+        --error-content: #1e293b;
+
+        /* DaisyUI HSL Variables - Dark - Updated for #5B6FD8 */
+        --p: 230 62% 60%;
+        --pc: 0 0% 100%;
+        --s: 45 93% 58%;
+        --sc: 220 13% 18%;
+        --a: 158 64% 52%;
+        --ac: 220 13% 18%;
+        --n: 220 14% 46%;
+        --nc: 220 13% 98%;
+        --b1: 220 13% 18%;
+        --b2: 220 13% 25%;
+        --b3: 220 13% 33%;
+        --bc: 220 13% 98%;
+        --in: 221 83% 70%;
+        --inc: 220 13% 18%;
+        --su: 158 64% 52%;
+        --suc: 220 13% 18%;
+        --wa: 45 93% 58%;
+        --wac: 220 13% 18%;
+        --er: 4 90% 70%;
+        --erc: 220 13% 18%;
     }
 }
 
@@ -24,5 +113,63 @@ body {
     background: var(--background);
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
-    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Force override DaisyUI primary color - Now using #3448C5 */
+[data-theme="light"] {
+    --p: 232 58% 49% !important;
+    --pc: 0 0% 100% !important;
+    --primary: #3448C5 !important;
+    --primary-content: #ffffff !important;
+}
+
+[data-theme="dark"] {
+    --p: 230 62% 60% !important;
+    --pc: 0 0% 100% !important;
+    --primary: #5B6FD8 !important;
+    --primary-content: #ffffff !important;
+}
+
+/* Additional force overrides - Light theme */
+[data-theme="light"] .btn-primary {
+    background-color: #3448C5 !important;
+    border-color: #3448C5 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-primary:hover {
+    background-color: #2A3BA3 !important;
+    border-color: #2A3BA3 !important;
+}
+
+[data-theme="light"] .bg-primary {
+    background-color: #3448C5 !important;
+}
+
+[data-theme="light"] .text-primary {
+    color: #3448C5 !important;
+}
+
+[data-theme="light"] .card.bg-primary {
+    background-color: #3448C5 !important;
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .btn-primary {
+    background-color: #5B6FD8 !important;
+    border-color: #5B6FD8 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background-color: #7A8EE0 !important;
+    border-color: #7A8EE0 !important;
+}
+
+[data-theme="dark"] .bg-primary {
+    background-color: #5B6FD8 !important;
+}
+
+[data-theme="dark"] .text-primary {
+    color: #5B6FD8 !important;
 }
