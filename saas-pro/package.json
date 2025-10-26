@@ -1,39 +1,38 @@
 {
-  "name": "image-editor",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "@clerk/nextjs": "^6.31.6",
-    "@fortawesome/fontawesome-free": "^7.1.0",
-    "@prisma/client": "^6.15.0",
-    "axios": "^1.11.0",
-    "cloudinary": "^2.7.0",
-    "dayjs": "^1.11.18",
-    "filesize": "^11.0.2",
-    "lucide-react": "^0.542.0",
-    "next": "15.5.2",
-    "next-cloudinary": "^6.16.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "daisyui": "^5.0.54",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.2",
-    "prettier": "3.6.2",
-    "prisma": "^6.15.0",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+    "name": "image-editor",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev --turbopack",
+        "build": "prisma generate && next build",
+        "start": "next start",
+        "lint": "eslint"
+    },
+    "dependencies": {
+        "@clerk/nextjs": "^6.31.6",
+        "@prisma/client": "^6.15.0",
+        "axios": "^1.11.0",
+        "cloudinary": "^2.7.0",
+        "dayjs": "^1.11.18",
+        "filesize": "^11.0.2",
+        "lucide-react": "^0.542.0",
+        "next": "15.5.2",
+        "next-cloudinary": "^6.16.0",
+        "react": "19.1.0",
+        "react-dom": "19.1.0"
+    },
+    "devDependencies": {
+        "@eslint/eslintrc": "^3",
+        "@tailwindcss/postcss": "^4",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "daisyui": "^5.0.54",
+        "eslint": "^9",
+        "eslint-config-next": "15.5.2",
+        "prettier": "3.6.2",
+        "prisma": "^6.15.0",
+        "tailwindcss": "^4",
+        "typescript": "^5"
+    }
 }

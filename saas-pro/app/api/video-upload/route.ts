@@ -15,7 +15,7 @@ interface CloudinaryUploadResponse {
     public_id: string;
     bytes: number;
     duration?: number;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 function bufferToStream(buffer: Buffer) {

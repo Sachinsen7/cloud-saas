@@ -23,7 +23,7 @@ interface CloudinaryUploadResponse {
             };
         };
     };
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 interface FaceDetectionData {
@@ -47,7 +47,10 @@ interface FaceDetectionData {
             noiseLevel: string;
             value: number;
         };
-        accessories?: any[];
+        accessories?: Array<{
+            type: string;
+            confidence: number;
+        }>;
         occlusion?: {
             foreheadOccluded: boolean;
             eyeOccluded: boolean;
@@ -60,10 +63,10 @@ interface FaceDetectionData {
         };
     };
     facial_landmarks?: {
-        mouth?: any;
-        eyebrow?: any;
-        eye?: any;
-        nose?: any;
+        mouth?: Array<{ x: number; y: number }>;
+        eyebrow?: Array<{ x: number; y: number }>;
+        eye?: Array<{ x: number; y: number }>;
+        nose?: Array<{ x: number; y: number }>;
     };
 }
 
@@ -121,15 +124,19 @@ export async function POST(request: NextRequest) {
                 originalSize: uploadResult.bytes.toString(),
                 fileType: uploadResult.format,
                 tags: processedData.tags || [],
-                facialAttributes: faces as any,
+                facialAttributes: JSON.parse(JSON.stringify(faces)),
                 faceCount: faces.length,
                 hasFaces: faces.length > 0,
-                facesBoundingBoxes: faces.map(
-                    (face) => face.bounding_box
-                ) as any,
-                facialLandmarks: faces
-                    .map((face) => face.facial_landmarks)
-                    .filter(Boolean) as any,
+                facesBoundingBoxes: JSON.parse(
+                    JSON.stringify(faces.map((face) => face.bounding_box))
+                ),
+                facialLandmarks: JSON.parse(
+                    JSON.stringify(
+                        faces
+                            .map((face) => face.facial_landmarks)
+                            .filter(Boolean)
+                    )
+                ),
             },
         });
 
@@ -154,7 +161,7 @@ async function processFaceDetection(
     faces: FaceDetectionData[],
     processType: string
 ) {
-    const processedUrls: any = {};
+    const processedUrls: Record<string, string> = {};
     const tags: string[] = [];
 
     if (faces.length === 0) {

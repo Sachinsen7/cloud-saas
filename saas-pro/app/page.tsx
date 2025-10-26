@@ -1,21 +1,17 @@
-"use client";
-
-import { useState } from "react";
-import Image from "next/image";
-
+'use client';
 export default function Home() {
-  
-    const goToLogin = () => (window.location.href = "/sign-in");
-    const goToSignup = () => (window.location.href = "/sign-up");
-  
+    const goToLogin = () => (window.location.href = '/sign-in');
+    const goToSignup = () => (window.location.href = '/sign-up');
+
     return (
         <div
             className={`font-sans flex flex-col items-center justify-center min-h-screen p-8 bg-[#0a0a0a] relative overflow-hidden`}
-    >
+        >
             <main
-                className={` rounded-3xl shadow-3xl p-8 sm:p-16 max-w-2xl w-full text-center transition-all duration-500  backdrop-blur-lg bg-opacity-80 relative z-10 hover:shadow-4xl`}>
+                className={` rounded-3xl shadow-3xl p-8 sm:p-16 max-w-2xl w-full text-center transition-all duration-500  backdrop-blur-lg bg-opacity-80 relative z-10 hover:shadow-4xl`}
+            >
                 <div className="flex justify-center">
-                  <i className="fa-regular fa-image text-5xl text-[#312ed9] transition mb-10"></i>
+                    <i className="fa-regular fa-image text-5xl text-[#312ed9] transition mb-10"></i>
                 </div>
 
                 <h1
@@ -27,7 +23,7 @@ export default function Home() {
                     The Unified AI Platform For All Your Media.
                 </h2>
                 <p className="text-lg text-gray-500 mb-14 max-w-sm mx-auto leading-relaxed">
-                    Unleash the full potential of your media with{" "}
+                    Unleash the full potential of your media with{' '}
                     <span className="font-semibold text-gray-0">
                         AI-powered intelligent tools
                     </span>

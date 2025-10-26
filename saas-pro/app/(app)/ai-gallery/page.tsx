@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { CldImage } from 'next-cloudinary';
+
 import {
     Download,
     Eye,
@@ -26,7 +26,12 @@ interface AIImage {
     qualityScore?: number;
     qualityLevel?: string;
     watermarkDetected?: string;
-    objectDetection?: any;
+    objectDetection?: {
+        processedUrls?: {
+            processedUrl?: string;
+        };
+        [key: string]: unknown;
+    };
     createdAt: string;
 }
 
