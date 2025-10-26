@@ -54,10 +54,10 @@ const Home = () => {
     return (
         <div className="container mx-auto p-4 max-w-7xl">
             <div className="text-center mb-12">
-                <h1 className="text-5xl font-bold mb-4 bg-[#5754e8] bg-clip-text text-transparent">
+                <h1 className="text-5xl font-bold mb-4 text-primary">
                     Cloud SaaS Media Platform
                 </h1>
-                <p className="text-xl text-gray-500 mb-8">
+                <p className="text-xl text-base-content/70 mb-8">
                     Upload, process, and transform your media with powerful AI
                     tools
                 </p>
@@ -108,8 +108,8 @@ const Home = () => {
                         <div className="loading loading-spinner loading-lg"></div>
                     </div>
                 ) : error ? (
-                    <div className="text-center py-12 bg-red-50 rounded-2xl">
-                        <div className="text-red-500 mb-4">
+                    <div className="text-center py-12 bg-error/10 rounded-2xl">
+                        <div className="text-error mb-4">
                             <svg
                                 className="w-16 h-16 mx-auto mb-4"
                                 fill="currentColor"
@@ -123,10 +123,10 @@ const Home = () => {
                                 />
                             </svg>
                         </div>
-                        <h3 className="text-xl font-semibold text-red-600 mb-2">
+                        <h3 className="text-xl font-semibold text-error mb-2">
                             Error loading videos
                         </h3>
-                        <p className="text-red-500 mb-4">
+                        <p className="text-error/80 mb-4">
                             {error instanceof Error
                                 ? error.message
                                 : 'Failed to load videos'}
@@ -142,12 +142,12 @@ const Home = () => {
                         </button>
                     </div>
                 ) : videos.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-2xl">
-                        <VideoIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                    <div className="text-center py-12 bg-base-200 rounded-2xl">
+                        <VideoIcon className="w-16 h-16 mx-auto text-base-content/40 mb-4" />
+                        <h3 className="text-xl font-semibold text-base-content/80 mb-2">
                             No videos yet
                         </h3>
-                        <p className="text-gray-500 mb-4">
+                        <p className="text-base-content/60 mb-4">
                             Upload your first video to get started
                         </p>
                         <Link href="/video-upload" className="btn btn-primary">
