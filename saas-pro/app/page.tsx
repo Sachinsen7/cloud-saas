@@ -33,7 +33,7 @@ export default function Home() {
                     <button
                         onClick={goToLogin}
                         className={`
-              py-1 px-8 text-xl font-bold uppercase rounded-md 
+              py-3 px-7 text-xl font-bold uppercase rounded-md 
               bg-[#312ed9]  text-white 
               outline-none
               hover:bg-[#4b49d4]
