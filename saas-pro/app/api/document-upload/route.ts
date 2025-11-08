@@ -88,14 +88,8 @@ export async function POST(request: NextRequest) {
         
         const publicId = `${sanitizedTitle}_${Date.now()}.${fileExtension}`;
 
-        const uploadOptions: {
-            resource_type: string;
-            folder: string;
-            raw_convert: string;
-            public_id: string;
-            notification_url: string;
-        } = {
-            resource_type: 'raw',
+        const uploadOptions = {
+            resource_type: 'raw' as const,
             folder: 'saas-pro-documents',
             raw_convert: 'aspose',
             public_id: publicId,
