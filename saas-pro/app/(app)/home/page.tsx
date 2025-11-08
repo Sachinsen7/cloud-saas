@@ -5,7 +5,7 @@ import axios from 'axios';
 import VideoCard from '@/components/VideoCard';
 import AIFeatureShowcase from '@/components/AIFeatureCard';
 import { Video } from '@/generated/prisma';
-import { Video as VideoIcon, LockIcon } from 'lucide-react';
+import { Video as VideoIcon, LockIcon, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { FREE_FEATURES, PREMIUM_FEATURES } from '@/lib/features';
 

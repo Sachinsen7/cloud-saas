@@ -398,8 +398,8 @@ export default function AIVision() {
                                         <strong>Note:</strong> Tag names will be
                                         automatically converted to lowercase and
                                         special characters will be replaced with
-                                        hyphens (e.g., "Luxury Item" →
-                                        "luxury-item")
+                                        hyphens (e.g., &quot;Luxury Item&quot; →
+                                        &quot;luxury-item&quot;)
                                     </p>
                                 </div>
                                 {tagDefinitions.map((tag, index) => (
