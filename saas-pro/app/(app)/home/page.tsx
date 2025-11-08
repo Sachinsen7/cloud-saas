@@ -5,16 +5,9 @@ import axios from 'axios';
 import VideoCard from '@/components/VideoCard';
 import AIFeatureShowcase from '@/components/AIFeatureCard';
 import { Video } from '@/generated/prisma';
-import {
-    Upload,
-    Video as VideoIcon,
-    Wand2,
-    Image,
-    FileText as FileTextIcon,
-    Brain as BrainIcon,
-    Users as UsersIcon,
-} from 'lucide-react';
+import { Video as VideoIcon, LockIcon } from 'lucide-react';
 import Link from 'next/link';
+import { FREE_FEATURES, PREMIUM_FEATURES } from '@/lib/features';
 
 const Home = () => {
     const [videos, setVideos] = useState<Video[]>([]);
@@ -62,31 +55,49 @@ const Home = () => {
                     tools
                 </p>
 
-                <div className="flex flex-wrap justify-center gap-4 mb-8">
-                    <Link href="/video-upload" className="btn btn-primary">
-                        <Upload className="w-5 h-5 mr-2" />
-                        Upload Video
-                    </Link>
-                    <Link href="/ai-studio" className="btn btn-secondary">
-                        <Wand2 className="w-5 h-5 mr-2" />
-                        AI Studio
-                    </Link>
-                    <Link href="/face-studio" className="btn btn-success">
-                        <UsersIcon className="w-5 h-5 mr-2" />
-                        Face Studio
-                    </Link>
-                    <Link href="/ai-vision" className="btn btn-accent">
-                        <BrainIcon className="w-5 h-5 mr-2" />
-                        AI Vision
-                    </Link>
-                    <Link href="/document-studio" className="btn btn-info">
-                        <FileTextIcon className="w-5 h-5 mr-2" />
-                        Document Studio
-                    </Link>
-                    <Link href="/social" className="btn btn-outline">
-                        <Image className="w-5 h-5 mr-2" />
-                        Social Creator
-                    </Link>
+                <div className="space-y-8 mb-12">
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                            Free Features
+                        </h2>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            {FREE_FEATURES.filter(f => f.href !== '/home').map((feature) => {
+                                const Icon = feature.icon;
+                                return (
+                                    <Link
+                                        key={feature.href}
+                                        href={feature.href}
+                                        className="btn btn-primary btn-outline"
+                                    >
+                                        <Icon className="w-5 h-5 mr-2" />
+                                        {feature.label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <LockIcon className="w-6 h-6" />
+                            Premium Features
+                        </h2>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            {PREMIUM_FEATURES.map((feature) => {
+                                const Icon = feature.icon;
+                                return (
+                                    <Link
+                                        key={feature.href}
+                                        href={feature.href}
+                                        className="btn btn-secondary"
+                                    >
+                                        <Icon className="w-5 h-5 mr-2" />
+                                        {feature.label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
             </div>
 
