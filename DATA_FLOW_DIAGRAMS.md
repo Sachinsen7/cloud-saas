@@ -70,6 +70,9 @@
 ### Main System Processes
 
 ```
+### Main System Processes
+
+```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                        CLOUD SAAS MEDIA PLATFORM                         │
 │                                                                          │
@@ -93,6 +96,8 @@
 │                    │   (PostgreSQL)    │                               │
 │                    └───────────────────┘                               │
 └─────────────────────────────────────────────────────────────────────────┘
+```
+
 ```
 
 
@@ -146,6 +151,7 @@
 
 ### 3.1 Video Upload and Processing Flow
 
+```
 ```
 ┌──────────┐
 │   User   │
@@ -1300,7 +1306,3 @@ This comprehensive Data Flow Diagram documentation provides:
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: January 2025  
-**Prepared By**: AI Technical Documentation System  
-**Total Diagrams**: 15+ comprehensive flow diagrams
