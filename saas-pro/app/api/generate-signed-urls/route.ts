@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
             return new NextResponse("Public ID is required", { status: 400 });
         }
 
-        // Generate signed URLs for different transformations
         const urls = {
             original: cloudinary.url(publicId, {
                 type: 'upload'
