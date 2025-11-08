@@ -92,7 +92,11 @@ export default function DocumentStudio() {
             return;
         }
 
-        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+        const fileNameParts = file.name.split('.');
+        const fileExtension = fileNameParts.length > 1 
+            ? fileNameParts.pop()?.toLowerCase() 
+            : null;
+        
         if (!fileExtension || !SUPPORTED_FORMATS.includes(fileExtension)) {
             alert(
                 `Unsupported file format. Supported formats: ${SUPPORTED_FORMATS.join(', ')}`
@@ -118,7 +122,19 @@ export default function DocumentStudio() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to upload document');
+                let errorMessage = 'Failed to upload document';
+                try {
+                    const errorData = await response.json();
+                    if (errorData.error) {
+                        errorMessage = errorData.error;
+                    }
+                } catch {
+                    const errorText = await response.text();
+                    if (errorText) {
+                        errorMessage = errorText;
+                    }
+                }
+                throw new Error(errorMessage);
             }
 
             const result = await response.json();
