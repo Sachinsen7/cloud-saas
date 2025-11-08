@@ -54,7 +54,6 @@ export async function POST(request: NextRequest) {
             }
         );
 
-        // Process based on type
         let processedData: Record<string, unknown> = {};
 
         switch (processType) {
@@ -148,24 +147,36 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        return NextResponse.json({
+        const processedUrl =
+            typeof processedData.processedUrl === 'string'
+                ? processedData.processedUrl
+                : null;
+
+        const responseData = {
             ...image,
-            processedData,
+            processedData: {
+                ...processedData,
+            },
             originalUrl: cloudinary.url(uploadResult.public_id),
-            processedUrl: processedData.processedUrl || null,
-        });
+            processedUrl: processedUrl,
+        };
+
+        return NextResponse.json(responseData);
     } catch (error) {
         console.error('Error processing image:', error);
-        return new NextResponse('Error processing image', { status: 500 });
+        const errorMessage =
+            error instanceof Error ? error.message : 'Error processing image';
+        return new NextResponse(JSON.stringify({ error: errorMessage }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
     } finally {
         await prisma.$disconnect();
     }
 }
 
-// AI Processing Functions
 async function processBackgroundRemoval(publicId: string) {
     try {
-        // Use the new background_removal effect with signed URLs
         const processedUrl = cloudinary.url(publicId, {
             effect: 'background_removal',
             format: 'png',
@@ -173,7 +184,6 @@ async function processBackgroundRemoval(publicId: string) {
             type: 'upload',
         });
 
-        // Also create a version with fine edges for better quality
         const fineEdgesUrl = cloudinary.url(publicId, {
             effect: 'background_removal:fineedges_y',
             format: 'png',
@@ -200,14 +210,26 @@ async function processBackgroundRemoval(publicId: string) {
 
 async function processOCR(publicId: string) {
     try {
-        // Get OCR data from Cloudinary
-        const result = await cloudinary.api.resource(publicId, {
+        const result = await cloudinary.uploader.explicit(publicId, {
+            type: 'upload',
+            resource_type: 'image',
             ocr: 'adv_ocr',
         });
 
-        const extractedText =
-            result.info?.ocr?.adv_ocr?.data?.[0]?.textAnnotations?.[0]
-                ?.description || '';
+        let extractedText = '';
+        if (result.info?.ocr?.adv_ocr?.data) {
+            const ocrData = result.info.ocr.adv_ocr.data;
+            if (Array.isArray(ocrData) && ocrData.length > 0) {
+                extractedText = ocrData
+                    .map(
+                        (block: {
+                            textAnnotations?: Array<{ description?: string }>;
+                        }) => block.textAnnotations?.[0]?.description || ''
+                    )
+                    .filter((text: string) => text)
+                    .join(' ');
+            }
+        }
 
         return {
             extractedText,
@@ -222,21 +244,18 @@ async function processOCR(publicId: string) {
 
 async function processAutoTag(publicId: string) {
     try {
-        const result = await cloudinary.uploader.upload(
-            cloudinary.url(publicId),
-            {
-                detection: 'coco',
-                auto_tagging: 0.6,
-                public_id: `${publicId}_tagged`,
-                overwrite: true,
-            }
-        );
+        const result = await cloudinary.uploader.explicit(publicId, {
+            type: 'upload',
+            resource_type: 'image',
+            detection: 'coco',
+            auto_tagging: 0.6,
+        });
 
         const tags = result.tags || [];
         const detectionData =
             result.info?.detection?.object_detection?.data || {};
 
-        const detectedObjects = [];
+        const detectedObjects: string[] = [];
         for (const [model, data] of Object.entries(detectionData)) {
             if (data && typeof data === 'object' && 'tags' in data) {
                 const modelTags = (data as { tags: Record<string, unknown> })
@@ -266,16 +285,22 @@ async function processAutoTag(publicId: string) {
 async function processEnhancement(publicId: string) {
     try {
         const processedUrl = cloudinary.url(publicId, {
-            effect: 'viesus_correct',
             quality: 'auto:best',
             format: 'auto',
+            fetch_format: 'auto',
             sign_url: true,
             type: 'upload',
+            transformation: [
+                {
+                    quality: 'auto:best',
+                    fetch_format: 'auto',
+                },
+            ],
         });
 
         return {
             processedUrl,
-            tags: ['enhanced', 'viesus-corrected'],
+            tags: ['enhanced', 'quality-improved'],
             type: 'enhancement',
         };
     } catch (error) {
@@ -290,24 +315,22 @@ async function processEnhancement(publicId: string) {
 
 async function processImageQuality(publicId: string) {
     try {
-        const result = await cloudinary.uploader.upload(
-            cloudinary.url(publicId),
-            {
-                detection: 'iqa',
-                public_id: `${publicId}_quality`,
-                overwrite: true,
-            }
-        );
+        const result = await cloudinary.uploader.explicit(publicId, {
+            type: 'upload',
+            resource_type: 'image',
+            detection: 'iqa',
+        });
 
         const qualityData =
-            result.info?.detection?.object_detection?.data?.iqa?.tags?.[
-                'iqa-analysis'
-            ]?.[0];
+            result.info?.detection?.iqa?.data?.[0]?.tags?.['iqa-analysis']?.[0];
+
+        const score = qualityData?.attributes?.score || 0;
+        const quality = qualityData?.attributes?.quality || 'unknown';
 
         return {
-            qualityScore: qualityData?.attributes?.score || 0,
-            qualityLevel: qualityData?.attributes?.quality || 'unknown',
-            tags: [`quality-${qualityData?.attributes?.quality || 'unknown'}`],
+            qualityScore: typeof score === 'number' ? score : 0,
+            qualityLevel: typeof quality === 'string' ? quality : 'unknown',
+            tags: [`quality-${quality}`],
             type: 'quality-analysis',
         };
     } catch (error) {
@@ -323,20 +346,15 @@ async function processImageQuality(publicId: string) {
 
 async function processWatermarkDetection(publicId: string) {
     try {
-        const result = await cloudinary.uploader.upload(
-            cloudinary.url(publicId),
-            {
-                detection: 'watermark-detection',
-                auto_tagging: 0.5,
-                public_id: `${publicId}_watermark`,
-                overwrite: true,
-            }
-        );
+        const result = await cloudinary.uploader.explicit(publicId, {
+            type: 'upload',
+            resource_type: 'image',
+            detection: 'watermark-detection',
+        });
 
         const watermarkData =
-            result.info?.detection?.object_detection?.data?.[
-                'watermark-detection'
-            ]?.tags;
+            result.info?.detection?.['watermark-detection']?.data?.[0]?.tags;
+
         let watermarkType = 'clean';
 
         if (watermarkData?.banner?.[0]?.confidence > 0.5) {
@@ -362,16 +380,14 @@ async function processWatermarkDetection(publicId: string) {
 
 async function processImageCaptioning(publicId: string) {
     try {
-        const result = await cloudinary.uploader.upload(
-            cloudinary.url(publicId),
-            {
-                detection: 'captioning',
-                public_id: `${publicId}_caption`,
-                overwrite: true,
-            }
-        );
+        const result = await cloudinary.uploader.explicit(publicId, {
+            type: 'upload',
+            resource_type: 'image',
+            detection: 'captioning',
+        });
 
-        const caption = result.info?.detection?.captioning?.data?.caption || '';
+        const caption =
+            result.info?.detection?.captioning?.data?.[0]?.caption || '';
 
         return {
             aiCaption: caption,
@@ -386,18 +402,21 @@ async function processImageCaptioning(publicId: string) {
 
 async function processAdvancedObjectDetection(publicId: string) {
     try {
-        const result = await cloudinary.uploader.upload(
-            cloudinary.url(publicId),
-            {
-                auto_tagging: 0.6,
-                public_id: `${publicId}_objects`,
-                overwrite: true,
-            }
-        );
+        const result = await cloudinary.uploader.explicit(publicId, {
+            type: 'upload',
+            resource_type: 'image',
+            detection: 'coco',
+            auto_tagging: 0.6,
+        });
 
         const detectionData =
             result.info?.detection?.object_detection?.data || {};
-        const detectedObjects = [];
+        const detectedObjects: Array<{
+            object: string;
+            confidence: number;
+            boundingBox: unknown;
+            model: string;
+        }> = [];
 
         for (const [model, data] of Object.entries(detectionData)) {
             if (data && typeof data === 'object' && 'tags' in data) {
@@ -414,7 +433,7 @@ async function processAdvancedObjectDetection(publicId: string) {
                                     [key: string]: unknown;
                                 }) => ({
                                     object: objectName,
-                                    confidence: detection.confidence,
+                                    confidence: detection.confidence || 0,
                                     boundingBox:
                                         detection['bounding-box'] || null,
                                     model: model,
