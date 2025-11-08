@@ -25,7 +25,16 @@ interface ProcessedImage {
     processedData?: {
         watermarkDetected?: string;
         objectDetection?: Array<{ object: string; confidence: number }>;
-        [key: string]: string | number | boolean | Array<unknown> | Record<string, unknown> | null | undefined;
+        fineEdgesUrl?: string;
+        processedUrl?: string;
+        [key: string]:
+            | string
+            | number
+            | boolean
+            | Array<unknown>
+            | Record<string, unknown>
+            | null
+            | undefined;
     };
     originalUrl?: string;
     processedUrl?: string;
@@ -143,14 +152,45 @@ export default function AIStudio() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to process image');
+                let errorMessage = 'Failed to process image';
+                try {
+                    const errorText = await response.text();
+                    if (errorText) {
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            if (errorData.error) {
+                                errorMessage = errorData.error;
+                            }
+                        } catch {
+                            errorMessage = errorText || errorMessage;
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error reading error response:', err);
+                }
+                throw new Error(errorMessage);
             }
 
             const result = await response.json();
-            setProcessedImage(result);
+
+            const processedImageData: ProcessedImage = {
+                ...result,
+                processedData: {
+                    ...result.processedData,
+                    fineEdgesUrl:
+                        result.processedData?.fineEdgesUrl ||
+                        result.processedUrl,
+                },
+            };
+
+            setProcessedImage(processedImageData);
         } catch (error) {
             console.error('Error processing image:', error);
-            alert('Failed to process image. Please try again.');
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to process image. Please try again.';
+            alert(errorMessage);
         } finally {
             setIsProcessing(false);
         }
@@ -163,10 +203,9 @@ export default function AIStudio() {
 
     const downloadProcessedImage = () => {
         if (processedImage?.processedUrl) {
-            // Create a proper download link with CORS handling
             fetch(processedImage.processedUrl)
-                .then(response => response.blob())
-                .then(blob => {
+                .then((response) => response.blob())
+                .then((blob) => {
                     const url = window.URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
@@ -176,9 +215,8 @@ export default function AIStudio() {
                     document.body.removeChild(link);
                     window.URL.revokeObjectURL(url);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Download failed:', error);
-                    // Fallback to direct link
                     if (processedImage.processedUrl) {
                         const link = document.createElement('a');
                         link.href = processedImage.processedUrl;
@@ -212,10 +250,11 @@ export default function AIStudio() {
                     return (
                         <div
                             key={feature.id}
-                            className={`card cursor-pointer transition-all duration-200 ${selectedFeature === feature.id
-                                ? 'ring-2 ring-primary shadow-lg'
-                                : 'hover:shadow-md'
-                                }`}
+                            className={`card cursor-pointer transition-all duration-200 ${
+                                selectedFeature === feature.id
+                                    ? 'ring-2 ring-primary shadow-lg'
+                                    : 'hover:shadow-md'
+                            }`}
                             onClick={() => setSelectedFeature(feature.id)}
                         >
                             <div className="card-body p-4 text-center">
@@ -348,91 +387,180 @@ export default function AIStudio() {
 
                         {processedImage && (
                             <div className="space-y-4">
-                                {/* Processed Images */}
-                                {processedImage.processedUrl && typeof processedImage.processedUrl === 'string' && (
+                                {(processedImage.processedUrl ||
+                                    processedImage.processedData
+                                        ?.processedUrl) && (
                                     <div>
                                         <h3 className="font-semibold mb-2">
                                             Processed Image:
                                         </h3>
                                         <div className="grid grid-cols-1 gap-4">
-                                            {/* Standard Background Removal */}
-                                            <div className="bg-white p-3 rounded-lg border">
-                                                <h4 className="font-medium mb-2">Standard Background Removal</h4>
-                                                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-2">
-                                                    <img
-                                                        src={processedImage.processedUrl}
-                                                        alt="Background Removed"
-                                                        className="w-full h-full object-contain"
-                                                    />
-                                                </div>
-                                                <button
-                                                    className="btn btn-sm btn-primary"
-                                                    onClick={() => {
-                                                        const link = document.createElement('a');
-                                                        link.href = processedImage.processedUrl!;
-                                                        link.download = `${processedImage.title}_bg_removed.png`;
-                                                        link.target = '_blank';
-                                                        link.rel = 'noopener noreferrer';
-                                                        document.body.appendChild(link);
-                                                        link.click();
-                                                        document.body.removeChild(link);
-                                                    }}
-                                                >
-                                                    <Download className="w-4 h-4" />
-                                                    Download PNG
-                                                </button>
-                                            </div>
-
-                                            {/* Fine Edges Background Removal */}
-                                            {processedImage.processedData?.fineEdgesUrl && typeof processedImage.processedData.fineEdgesUrl === 'string' && (
+                                            {(processedImage.processedUrl ||
+                                                processedImage.processedData
+                                                    ?.processedUrl) && (
                                                 <div className="bg-white p-3 rounded-lg border">
-                                                    <h4 className="font-medium mb-2">Fine Edges (Better Quality)</h4>
+                                                    <h4 className="font-medium mb-2">
+                                                        {selectedFeature ===
+                                                        'background-removal'
+                                                            ? 'Standard Background Removal'
+                                                            : 'Processed Image'}
+                                                    </h4>
                                                     <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-2">
                                                         <img
-                                                            src={processedImage.processedData.fineEdgesUrl as string}
-                                                            alt="Background Removed - Fine Edges"
+                                                            src={
+                                                                (processedImage.processedUrl ||
+                                                                    processedImage
+                                                                        .processedData
+                                                                        ?.processedUrl) as string
+                                                            }
+                                                            alt="Processed"
                                                             className="w-full h-full object-contain"
+                                                            onError={(e) => {
+                                                                console.error(
+                                                                    'Image load error:',
+                                                                    e
+                                                                );
+                                                                (
+                                                                    e.target as HTMLImageElement
+                                                                ).style.display =
+                                                                    'none';
+                                                            }}
                                                         />
                                                     </div>
                                                     <button
-                                                        className="btn btn-sm btn-secondary"
+                                                        className="btn btn-sm btn-primary"
                                                         onClick={() => {
-                                                            const link = document.createElement('a');
-                                                            link.href = processedImage.processedData?.fineEdgesUrl as string;
-                                                            link.download = `${processedImage.title}_fine_edges.png`;
+                                                            const url =
+                                                                (processedImage.processedUrl ||
+                                                                    processedImage
+                                                                        .processedData
+                                                                        ?.processedUrl) as string;
+                                                            const link =
+                                                                document.createElement(
+                                                                    'a'
+                                                                );
+                                                            link.href = url;
+                                                            link.download = `${processedImage.title}_processed.png`;
+                                                            link.target =
+                                                                '_blank';
+                                                            link.rel =
+                                                                'noopener noreferrer';
+                                                            document.body.appendChild(
+                                                                link
+                                                            );
                                                             link.click();
+                                                            document.body.removeChild(
+                                                                link
+                                                            );
                                                         }}
                                                     >
                                                         <Download className="w-4 h-4" />
-                                                        Download Fine Edges PNG
+                                                        Download
                                                     </button>
                                                 </div>
                                             )}
+
+                                            {processedImage.processedData
+                                                ?.fineEdgesUrl &&
+                                                typeof processedImage
+                                                    .processedData
+                                                    .fineEdgesUrl ===
+                                                    'string' && (
+                                                    <div className="bg-white p-3 rounded-lg border">
+                                                        <h4 className="font-medium mb-2">
+                                                            Fine Edges (Better
+                                                            Quality)
+                                                        </h4>
+                                                        <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-2">
+                                                            <img
+                                                                src={
+                                                                    processedImage
+                                                                        .processedData
+                                                                        .fineEdgesUrl
+                                                                }
+                                                                alt="Background Removed - Fine Edges"
+                                                                className="w-full h-full object-contain"
+                                                                onError={(
+                                                                    e
+                                                                ) => {
+                                                                    console.error(
+                                                                        'Image load error:',
+                                                                        e
+                                                                    );
+                                                                    (
+                                                                        e.target as HTMLImageElement
+                                                                    ).style.display =
+                                                                        'none';
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            className="btn btn-sm btn-secondary"
+                                                            onClick={() => {
+                                                                const link =
+                                                                    document.createElement(
+                                                                        'a'
+                                                                    );
+                                                                link.href =
+                                                                    processedImage
+                                                                        .processedData
+                                                                        ?.fineEdgesUrl as string;
+                                                                link.download = `${processedImage.title}_fine_edges.png`;
+                                                                link.target =
+                                                                    '_blank';
+                                                                link.rel =
+                                                                    'noopener noreferrer';
+                                                                document.body.appendChild(
+                                                                    link
+                                                                );
+                                                                link.click();
+                                                                document.body.removeChild(
+                                                                    link
+                                                                );
+                                                            }}
+                                                        >
+                                                            <Download className="w-4 h-4" />
+                                                            Download Fine Edges
+                                                            PNG
+                                                        </button>
+                                                    </div>
+                                                )}
                                         </div>
                                     </div>
                                 )}
 
                                 {/* OCR Results */}
-                                {processedImage.extractedText && (
+                                {selectedFeature === 'ocr' && (
                                     <div>
                                         <h3 className="font-semibold mb-2">
                                             Extracted Text:
                                         </h3>
                                         <div className="bg-gray-50 p-4 rounded-lg">
-                                            <p className="text-sm whitespace-pre-wrap">
-                                                {processedImage.extractedText}
-                                            </p>
-                                            <button
-                                                className="btn btn-sm btn-outline mt-2"
-                                                onClick={() =>
-                                                    copyToClipboard(
-                                                        processedImage.extractedText!
-                                                    )
-                                                }
-                                            >
-                                                <Copy className="w-4 h-4" />
-                                                Copy Text
-                                            </button>
+                                            {processedImage.extractedText ? (
+                                                <>
+                                                    <p className="text-sm whitespace-pre-wrap">
+                                                        {
+                                                            processedImage.extractedText
+                                                        }
+                                                    </p>
+                                                    <button
+                                                        className="btn btn-sm btn-outline mt-2"
+                                                        onClick={() =>
+                                                            copyToClipboard(
+                                                                processedImage.extractedText!
+                                                            )
+                                                        }
+                                                    >
+                                                        <Copy className="w-4 h-4" />
+                                                        Copy Text
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <p className="text-sm text-gray-500 italic">
+                                                    No text detected in this
+                                                    image.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -460,76 +588,188 @@ export default function AIStudio() {
                                     )}
 
                                 {/* AI Caption */}
-                                {processedImage.processedData?.aiCaption && typeof processedImage.processedData.aiCaption === 'string' && (
+                                {selectedFeature === 'captioning' && (
                                     <div>
-                                        <h3 className="font-semibold mb-2">AI Caption:</h3>
+                                        <h3 className="font-semibold mb-2">
+                                            AI Caption:
+                                        </h3>
                                         <div className="bg-blue-50 p-4 rounded-lg">
-                                            <p className="text-sm">{processedImage.processedData.aiCaption}</p>
-                                            <button
-                                                className="btn btn-sm btn-outline mt-2"
-                                                onClick={() => copyToClipboard(processedImage.processedData?.aiCaption as string)}
-                                            >
-                                                <Copy className="w-4 h-4" />
-                                                Copy Caption
-                                            </button>
+                                            {processedImage.processedData
+                                                ?.aiCaption &&
+                                            typeof processedImage.processedData
+                                                .aiCaption === 'string' &&
+                                            processedImage.processedData
+                                                .aiCaption.length > 0 ? (
+                                                <>
+                                                    <p className="text-sm">
+                                                        {
+                                                            processedImage
+                                                                .processedData
+                                                                .aiCaption
+                                                        }
+                                                    </p>
+                                                    <button
+                                                        className="btn btn-sm btn-outline mt-2"
+                                                        onClick={() =>
+                                                            copyToClipboard(
+                                                                processedImage
+                                                                    .processedData
+                                                                    ?.aiCaption as string
+                                                            )
+                                                        }
+                                                    >
+                                                        <Copy className="w-4 h-4" />
+                                                        Copy Caption
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <p className="text-sm text-gray-500 italic">
+                                                    Caption generation is in
+                                                    progress or failed. Please
+                                                    try again.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Quality Analysis */}
-                                {processedImage.processedData?.qualityScore !== undefined && typeof processedImage.processedData.qualityScore === 'number' && (
-                                    <div>
-                                        <h3 className="font-semibold mb-2">Quality Analysis:</h3>
-                                        <div className="bg-orange-50 p-4 rounded-lg">
-                                            <div className="flex items-center gap-4">
-                                                <div>
-                                                    <p className="text-sm font-medium">Score: {((processedImage.processedData.qualityScore as number) * 100).toFixed(1)}%</p>
-                                                    <p className="text-sm">Level: <span className="capitalize">{processedImage.processedData.qualityLevel as string}</span></p>
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                                        <div
-                                                            className="bg-orange-500 h-2 rounded-full"
-                                                            style={{ width: `${(processedImage.processedData.qualityScore as number) * 100}%` }}
-                                                        ></div>
+                                {processedImage.processedData?.qualityScore !==
+                                    undefined &&
+                                    typeof processedImage.processedData
+                                        .qualityScore === 'number' && (
+                                        <div>
+                                            <h3 className="font-semibold mb-2">
+                                                Quality Analysis:
+                                            </h3>
+                                            <div className="bg-orange-50 p-4 rounded-lg">
+                                                <div className="flex items-center gap-4">
+                                                    <div>
+                                                        <p className="text-sm font-medium">
+                                                            Score:{' '}
+                                                            {(
+                                                                (processedImage
+                                                                    .processedData
+                                                                    .qualityScore as number) *
+                                                                100
+                                                            ).toFixed(1)}
+                                                            %
+                                                        </p>
+                                                        <p className="text-sm">
+                                                            Level:{' '}
+                                                            <span className="capitalize">
+                                                                {
+                                                                    processedImage
+                                                                        .processedData
+                                                                        .qualityLevel as string
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                                            <div
+                                                                className="bg-orange-500 h-2 rounded-full"
+                                                                style={{
+                                                                    width: `${(processedImage.processedData.qualityScore as number) * 100}%`,
+                                                                }}
+                                                            ></div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 {/* Watermark Detection */}
-                                {processedImage.processedData?.watermarkDetected && typeof processedImage.processedData.watermarkDetected === 'string' && (
+                                {selectedFeature === 'watermark-detection' && (
                                     <div>
-                                        <h3 className="font-semibold mb-2">Watermark Detection:</h3>
+                                        <h3 className="font-semibold mb-2">
+                                            Watermark Detection:
+                                        </h3>
                                         <div className="bg-pink-50 p-4 rounded-lg">
-                                            <span className={`badge ${processedImage.processedData.watermarkDetected === 'clean' ? 'badge-success' :
-                                                processedImage.processedData.watermarkDetected === 'watermark' ? 'badge-warning' :
-                                                    'badge-error'
-                                                }`}>
-                                                {processedImage.processedData.watermarkDetected.toUpperCase()}
-                                            </span>
+                                            {processedImage.processedData
+                                                ?.watermarkDetected &&
+                                            typeof processedImage.processedData
+                                                .watermarkDetected ===
+                                                'string' ? (
+                                                <span
+                                                    className={`badge ${
+                                                        processedImage
+                                                            .processedData
+                                                            .watermarkDetected ===
+                                                        'clean'
+                                                            ? 'badge-success'
+                                                            : processedImage
+                                                                    .processedData
+                                                                    .watermarkDetected ===
+                                                                'watermark'
+                                                              ? 'badge-warning'
+                                                              : 'badge-error'
+                                                    }`}
+                                                >
+                                                    {processedImage.processedData.watermarkDetected.toUpperCase()}
+                                                </span>
+                                            ) : (
+                                                <p className="text-sm text-gray-500 italic">
+                                                    No watermark detected. Image
+                                                    appears clean.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Object Detection */}
-                                {processedImage.processedData?.objectDetection && Array.isArray(processedImage.processedData.objectDetection) && processedImage.processedData.objectDetection.length > 0 && (
-                                    <div>
-                                        <h3 className="font-semibold mb-2">Detected Objects:</h3>
-                                        <div className="bg-teal-50 p-4 rounded-lg">
-                                            <div className="space-y-2">
-                                                {processedImage.processedData.objectDetection.slice(0, 5).map((obj: { object: string; confidence: number }, index: number) => (
-                                                    <div key={index} className="flex justify-between items-center">
-                                                        <span className="text-sm font-medium capitalize">{obj.object}</span>
-                                                        <span className="text-xs text-gray-500">{(obj.confidence * 100).toFixed(1)}%</span>
-                                                    </div>
-                                                ))}
+                                {processedImage.processedData
+                                    ?.objectDetection &&
+                                    Array.isArray(
+                                        processedImage.processedData
+                                            .objectDetection
+                                    ) &&
+                                    processedImage.processedData.objectDetection
+                                        .length > 0 && (
+                                        <div>
+                                            <h3 className="font-semibold mb-2">
+                                                Detected Objects:
+                                            </h3>
+                                            <div className="bg-teal-50 p-4 rounded-lg">
+                                                <div className="space-y-2">
+                                                    {processedImage.processedData.objectDetection
+                                                        .slice(0, 5)
+                                                        .map(
+                                                            (
+                                                                obj: {
+                                                                    object: string;
+                                                                    confidence: number;
+                                                                },
+                                                                index: number
+                                                            ) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex justify-between items-center"
+                                                                >
+                                                                    <span className="text-sm font-medium capitalize">
+                                                                        {
+                                                                            obj.object
+                                                                        }
+                                                                    </span>
+                                                                    <span className="text-xs text-gray-500">
+                                                                        {(
+                                                                            obj.confidence *
+                                                                            100
+                                                                        ).toFixed(
+                                                                            1
+                                                                        )}
+                                                                        %
+                                                                    </span>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 {/* Success Message */}
                                 <div className="alert alert-success">
