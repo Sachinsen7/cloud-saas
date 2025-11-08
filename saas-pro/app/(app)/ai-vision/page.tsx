@@ -155,6 +155,15 @@ export default function AIVision() {
         setPrompts(updated);
     };
 
+    const sanitizeTagName = (name: string): string => {
+        return name
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9-]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+    };
+
     const handleAnalyze = async () => {
         if (!file || !previewUrl) {
             alert('Please select an image first');
@@ -164,24 +173,52 @@ export default function AIVision() {
         setIsProcessing(true);
 
         try {
+            const uploadFormData = new FormData();
+            uploadFormData.append('file', file);
+
+            const uploadResponse = await fetch('/api/image-upload', {
+                method: 'POST',
+                body: uploadFormData,
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Failed to upload image');
+            }
+
+            const uploadResult = await uploadResponse.json();
+            const imageUrl = uploadResult.url;
+
+            if (!imageUrl) {
+                throw new Error('Failed to get image URL from upload');
+            }
+
             const requestData: {
                 mode: string;
                 imageUrl: string;
+                publicId?: string;
                 tagDefinitions?: TagDefinition[];
                 rejectionQuestions?: string[];
                 prompts?: string[];
             } = {
                 mode: selectedMode,
-                imageUrl: previewUrl,
+                imageUrl: imageUrl,
+                publicId: uploadResult.publicId,
             };
 
             switch (selectedMode) {
                 case 'tagging':
-                    const validTags = tagDefinitions.filter(
-                        (tag) => tag.name.trim() && tag.description.trim()
-                    );
+                    const validTags = tagDefinitions
+                        .filter(
+                            (tag) => tag.name.trim() && tag.description.trim()
+                        )
+                        .map((tag) => ({
+                            name: sanitizeTagName(tag.name),
+                            description: tag.description.trim(),
+                        }))
+                        .filter((tag) => tag.name.length > 0);
                     if (validTags.length === 0) {
                         alert('Please add at least one valid tag definition');
+                        setIsProcessing(false);
                         return;
                     }
                     requestData.tagDefinitions = validTags;
@@ -193,6 +230,7 @@ export default function AIVision() {
                     );
                     if (validQuestions.length === 0) {
                         alert('Please add at least one moderation question');
+                        setIsProcessing(false);
                         return;
                     }
                     requestData.rejectionQuestions = validQuestions;
@@ -202,6 +240,7 @@ export default function AIVision() {
                     const validPrompts = prompts.filter((p) => p.trim());
                     if (validPrompts.length === 0) {
                         alert('Please add at least one prompt');
+                        setIsProcessing(false);
                         return;
                     }
                     requestData.prompts = validPrompts;
@@ -217,7 +256,29 @@ export default function AIVision() {
             });
 
             if (!response.ok) {
-                throw new Error('AI Vision analysis failed');
+                let errorMessage = 'AI Vision analysis failed';
+                try {
+                    const errorText = await response.text();
+                    if (errorText) {
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            if (errorData.error?.details?.message) {
+                                errorMessage = errorData.error.details.message;
+                            } else if (errorData.error?.message) {
+                                errorMessage = errorData.error.message;
+                            } else if (typeof errorData === 'string') {
+                                errorMessage = errorData;
+                            }
+                        } catch {
+                            errorMessage = errorText || errorMessage;
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error reading error response:', err);
+                }
+                console.error('AI Vision API error:', errorMessage);
+                alert(`AI Vision analysis failed: ${errorMessage}`);
+                throw new Error(errorMessage);
             }
 
             const result = await response.json();
@@ -331,6 +392,15 @@ export default function AIVision() {
                                         <Plus className="w-4 h-4" />
                                         Add Tag
                                     </button>
+                                </div>
+                                <div className="alert alert-warning py-2">
+                                    <p className="text-xs">
+                                        <strong>Note:</strong> Tag names will be
+                                        automatically converted to lowercase and
+                                        special characters will be replaced with
+                                        hyphens (e.g., "Luxury Item" →
+                                        "luxury-item")
+                                    </p>
                                 </div>
                                 {tagDefinitions.map((tag, index) => (
                                     <div
