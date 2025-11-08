@@ -4,37 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useClerk, useUser } from '@clerk/nextjs';
-
-import {
-    LogOutIcon,
-    MenuIcon,
-    LayoutDashboardIcon,
-    Share2Icon,
-    UploadIcon,
-    ImageIcon,
-    Wand2Icon,
-    GalleryHorizontalIcon,
-    FileTextIcon,
-    BrainIcon,
-    UsersIcon,
-} from 'lucide-react';
-
-
-const sidebarItems = [
-    { href: '/home', icon: LayoutDashboardIcon, label: 'Home Page' },
-    { href: '/videos', icon: ImageIcon, label: 'Videos' },
-    { href: '/social', icon: Share2Icon, label: 'Social Share' },
-    { href: '/video-upload', icon: UploadIcon, label: 'Video Upload' },
-    { href: '/ai-studio', icon: Wand2Icon, label: 'AI Studio' },
-    { href: '/ai-gallery', icon: GalleryHorizontalIcon, label: 'AI Gallery' },
-    { href: '/ai-vision', icon: BrainIcon, label: 'AI Vision' },
-    { href: '/face-studio', icon: UsersIcon, label: 'Face Studio' },
-    { href: '/document-studio', icon: FileTextIcon, label: 'Document Studio' },
-    { href: '/bg-test', icon: Wand2Icon, label: 'BG Test' },
-    { href: '/color-test', icon: ImageIcon, label: 'Color Test' },
-    { href: '/debug-colors', icon: ImageIcon, label: 'Debug Colors' },
-    { href: '/simple-test', icon: ImageIcon, label: 'Simple Test' },
-];
+import { LogOutIcon, MenuIcon, ImageIcon, LockIcon } from 'lucide-react';
+import { FREE_FEATURES, PREMIUM_FEATURES } from '@/lib/features';
 
 export default function AppLayout({
     children,
@@ -171,23 +142,58 @@ export default function AppLayout({
                     <div className="flex items-center justify-center py-4">
                         <ImageIcon className="w-10 h-10 text-primary" />
                     </div>
-                    <ul className="menu p-4 w-full text-base-content flex-grow">
-                        {sidebarItems.map((item) => (
-                            <li key={item.href} className="mb-2">
-                                <Link
-                                    href={item.href}
-                                    className={`flex items-center space-x-4 px-4 py-2 rounded-lg ${pathname === item.href
-                                        ? 'bg-primary text-white'
-                                        : 'hover:bg-base-300'
-                                        }`}
-                                    onClick={() => setSidebarOpen(false)}
-                                >
-                                    <item.icon className="w-6 h-6" />
-                                    <span>{item.label}</span>
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="flex flex-col flex-grow overflow-y-auto">
+                        <div className="p-4">
+                            <div className="text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-2 px-2">
+                                Free Features
+                            </div>
+                            <ul className="menu w-full text-base-content">
+                                {FREE_FEATURES.map((item) => (
+                                    <li key={item.href} className="mb-1">
+                                        <Link
+                                            href={item.href}
+                                            className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                                                pathname === item.href
+                                                    ? 'bg-primary text-white'
+                                                    : 'hover:bg-base-300'
+                                            }`}
+                                            onClick={() => setSidebarOpen(false)}
+                                        >
+                                            <item.icon className="w-5 h-5" />
+                                            <span className="text-sm">{item.label}</span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className="divider my-2"></div>
+
+                        <div className="p-4">
+                            <div className="text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-2 px-2 flex items-center gap-1">
+                                <LockIcon className="w-3 h-3" />
+                                Premium Features
+                            </div>
+                            <ul className="menu w-full text-base-content">
+                                {PREMIUM_FEATURES.map((item) => (
+                                    <li key={item.href} className="mb-1">
+                                        <Link
+                                            href={item.href}
+                                            className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                                                pathname === item.href
+                                                    ? 'bg-primary text-white'
+                                                    : 'hover:bg-base-300'
+                                            }`}
+                                            onClick={() => setSidebarOpen(false)}
+                                        >
+                                            <item.icon className="w-5 h-5" />
+                                            <span className="text-sm">{item.label}</span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                     {user && (
                         <div className="p-4">
                             <button
