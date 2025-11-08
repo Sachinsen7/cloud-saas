@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "next dev --turbopack",
         "build": "prisma generate && next build",
+        "build:safe": "powershell -ExecutionPolicy Bypass -File ./build-safe.ps1",
         "start": "next start",
         "lint": "eslint"
     },
