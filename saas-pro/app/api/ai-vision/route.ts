@@ -60,7 +60,26 @@ export async function POST(request: NextRequest) {
                         { status: 400 }
                     );
                 }
-                payload.tag_definitions = tagDefinitions.slice(0, 10);
+                const sanitizedTags = tagDefinitions.slice(0, 10).map((tag) => {
+                    const sanitizedName = tag.name
+                        .toLowerCase()
+                        .trim()
+                        .replace(/[^a-z0-9-]/g, '-')
+                        .replace(/-+/g, '-')
+                        .replace(/^-|-$/g, '');
+
+                    if (!sanitizedName) {
+                        throw new Error(
+                            `Invalid tag name: "${tag.name}". Tag names can only contain lower-case alphanumeric characters or hyphens.`
+                        );
+                    }
+
+                    return {
+                        name: sanitizedName,
+                        description: tag.description.trim(),
+                    };
+                });
+                payload.tag_definitions = sanitizedTags;
                 break;
 
             case 'moderation':
@@ -102,11 +121,32 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('AI Vision API error:', errorText);
-            return new NextResponse(`AI Vision API error: ${response.status}`, {
-                status: response.status,
-            });
+            let errorMessage = `AI Vision API error: ${response.status}`;
+            try {
+                const errorText = await response.text();
+                if (errorText) {
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        if (errorData.error?.details?.message) {
+                            errorMessage = errorData.error.details.message;
+                        } else if (errorData.error?.message) {
+                            errorMessage = errorData.error.message;
+                        }
+                    } catch {
+                        errorMessage = errorText || errorMessage;
+                    }
+                }
+            } catch (err) {
+                console.error('Error reading error response:', err);
+            }
+            console.error('AI Vision API error:', errorMessage);
+            return new NextResponse(
+                JSON.stringify({ error: { message: errorMessage } }),
+                {
+                    status: response.status,
+                    headers: { 'Content-Type': 'application/json' },
+                }
+            );
         }
 
         const result = await response.json();
@@ -165,7 +205,21 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(result);
     } catch (error) {
         console.error('AI Vision error:', error);
-        return new NextResponse('AI Vision processing failed', { status: 500 });
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : 'AI Vision processing failed';
+        return new NextResponse(
+            JSON.stringify({ error: { message: errorMessage } }),
+            {
+                status:
+                    error instanceof Error &&
+                    errorMessage.includes('Invalid tag')
+                        ? 400
+                        : 500,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
     } finally {
         await prisma.$disconnect();
     }
