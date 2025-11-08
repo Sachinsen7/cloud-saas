@@ -61,30 +61,58 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+        const fileNameParts = file.name.split('.');
+        const fileExtension = fileNameParts.length > 1 
+            ? fileNameParts.pop()?.toLowerCase() 
+            : null;
+        
         if (!fileExtension || !SUPPORTED_FORMATS.includes(fileExtension)) {
             return new NextResponse(
-                `Unsupported file format. Supported formats: ${SUPPORTED_FORMATS.join(', ')}`,
-                { status: 400 }
+                JSON.stringify({ 
+                    error: `Unsupported file format. Supported formats: ${SUPPORTED_FORMATS.join(', ')}`,
+                    receivedExtension: fileExtension || 'none'
+                }),
+                { 
+                    status: 400,
+                    headers: { 'Content-Type': 'application/json' }
+                }
             );
         }
 
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
+        const sanitizedTitle = (title || file.name.split('.')[0] || 'document')
+            .replace(/\s+/g, '_')
+            .replace(/[^a-zA-Z0-9_-]/g, '');
+        
+        const publicId = `${sanitizedTitle}_${Date.now()}.${fileExtension}`;
+
+        const uploadOptions: {
+            resource_type: string;
+            folder: string;
+            raw_convert: string;
+            public_id: string;
+            notification_url: string;
+        } = {
+            resource_type: 'raw',
+            folder: 'saas-pro-documents',
+            raw_convert: 'aspose',
+            public_id: publicId,
+            notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/document-webhook`,
+        };
+
         const uploadResult = await new Promise<CloudinaryUploadResponse>(
             (resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
-                    {
-                        resource_type: 'raw',
-                        folder: 'saas-pro-documents',
-                        raw_convert: 'aspose',
-                        public_id: `${title.replace(/\s+/g, '_')}_${Date.now()}`,
-                        notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/document-webhook`,
-                    },
+                    uploadOptions,
                     (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result as CloudinaryUploadResponse);
+                        if (error) {
+                            console.error('Cloudinary upload error:', error);
+                            reject(error);
+                        } else {
+                            resolve(result as CloudinaryUploadResponse);
+                        }
                     }
                 );
                 uploadStream.end(buffer);
@@ -112,7 +140,23 @@ export async function POST(request: NextRequest) {
         });
     } catch (error) {
         console.error('Error uploading document:', error);
-        return new NextResponse('Error uploading document', { status: 500 });
+        const errorMessage = error instanceof Error 
+            ? error.message 
+            : 'Error uploading document';
+        const errorDetails = error instanceof Error && 'http_code' in error
+            ? { http_code: (error as { http_code: number }).http_code }
+            : {};
+        
+        return new NextResponse(
+            JSON.stringify({ 
+                error: errorMessage,
+                ...errorDetails
+            }),
+            { 
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
     } finally {
         await prisma.$disconnect();
     }
