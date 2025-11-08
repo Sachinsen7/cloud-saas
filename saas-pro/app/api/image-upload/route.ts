@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
             {
                 publicId: result.public_id,
+                url: result.secure_url || result.url,
             },
             { status: 200 }
         );
