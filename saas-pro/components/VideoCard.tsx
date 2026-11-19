@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Download, Clock, FileDown, FileUp } from 'lucide-react';
+import { Download, Clock, FileDown, FileUp, Trash2 } from 'lucide-react';
 import { getCldOgImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -21,11 +21,34 @@ interface VideoCardProps {
         updatedAt: Date | string;
     };
     onDownload?: (url: string, title: string) => void;
+    onDelete?: (id: string) => Promise<void>;
 }
 
-const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
+const VideoCard: React.FC<VideoCardProps> = ({
+    video,
+    onDownload,
+    onDelete,
+}) => {
     const [isHovered, setIsHovered] = useState(false);
     const [previewError, setPreviewError] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        if (!onDelete) return;
+        if (
+            !window.confirm(
+                `Delete "${video.title}"? This permanently removes the video and cannot be undone.`
+            )
+        ) {
+            return;
+        }
+        setIsDeleting(true);
+        try {
+            await onDelete(video.id);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     const getThumbnailUrl = useCallback((publicId: string) => {
         return getCldOgImageUrl({
@@ -147,8 +170,26 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
                             {compressionPercentage}%
                         </span>
                     </div>
+                    <div className="flex gap-2">
+                    {onDelete && (
+                        <button
+                            className="btn btn-error btn-outline btn-sm"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            aria-label={`Delete ${video.title}`}
+                            title="Delete video"
+                        >
+                            {isDeleting ? (
+                                <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                                <Trash2 size={16} />
+                            )}
+                        </button>
+                    )}
                     <button
                         className="btn btn-primary btn-sm"
+                        aria-label={`Download ${video.title}`}
+                        title="Download video"
                         onClick={() => {
                             if (onDownload) {
                                 onDownload(
@@ -165,6 +206,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
                     >
                         <Download size={16} />
                     </button>
+                    </div>
                 </div>
             </div>
         </div>

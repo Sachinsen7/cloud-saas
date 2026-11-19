@@ -43,6 +43,23 @@ export default function VideosPage() {
         }
     };
 
+    const handleDelete = async (id: string) => {
+        try {
+            const response = await fetch(`/api/videos/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(
+                    (await response.text()) ||
+                        `Delete failed: ${response.status}`
+                );
+            }
+            setVideos((prev) => prev.filter((v) => v.id !== id));
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Failed to delete video');
+        }
+    };
+
     if (loading) {
         return (
             <div className="container mx-auto p-4">
@@ -97,7 +114,11 @@ export default function VideosPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {videos.map((video) => (
-                        <VideoCard key={video.id} video={video} />
+                        <VideoCard
+                            key={video.id}
+                            video={video}
+                            onDelete={handleDelete}
+                        />
                     ))}
                 </div>
             )}
