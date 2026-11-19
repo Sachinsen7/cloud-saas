@@ -3,48 +3,34 @@ import { PrismaClient } from '@/generated/prisma';
 
 const prisma = new PrismaClient();
 
+// Public endpoint: reports only booleans, never values or error details.
 export async function GET() {
+    const env = {
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        hasCloudinaryCloudName: !!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+        hasCloudinaryApiKey: !!process.env.CLOUDINARY_API_KEY,
+        hasCloudinaryApiSecret: !!process.env.CLOUDINARY_API_SECRET,
+        hasClerkPublishableKey: !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+        hasClerkSecretKey: !!process.env.CLERK_SECRET_KEY,
+    };
+
+    let databaseConnected = false;
     try {
-        const health = {
-            status: 'ok',
-            timestamp: new Date().toISOString(),
-            environment: {
-                nodeEnv: process.env.NODE_ENV,
-                hasDatabaseUrl: !!process.env.DATABASE_URL,
-                hasCloudinaryCloudName:
-                    !!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-                hasCloudinaryApiKey: !!process.env.CLOUDINARY_API_KEY,
-                hasCloudinaryApiSecret: !!process.env.CLOUDINARY_API_SECRET,
-                hasClerkPublishableKey:
-                    !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-                hasClerkSecretKey: !!process.env.CLERK_SECRET_KEY,
-            },
-            database: {
-                status: 'unknown',
-                error: null as string | null,
-            },
-        };
-
-        try {
-            await prisma.$connect();
-            health.database.status = 'connected';
-        } catch (error) {
-            health.database.status = 'error';
-            health.database.error =
-                error instanceof Error ? error.message : 'Unknown error';
-        } finally {
-            await prisma.$disconnect();
-        }
-
-        return NextResponse.json(health);
+        await prisma.$queryRaw`SELECT 1`;
+        databaseConnected = true;
     } catch (error) {
-        return NextResponse.json(
-            {
-                status: 'error',
-                timestamp: new Date().toISOString(),
-                error: error instanceof Error ? error.message : 'Unknown error',
-            },
-            { status: 500 }
-        );
+        console.error('Health check database error:', error);
     }
+
+    const ok = databaseConnected && Object.values(env).every(Boolean);
+
+    return NextResponse.json(
+        {
+            status: ok ? 'ok' : 'degraded',
+            timestamp: new Date().toISOString(),
+            environment: env,
+            databaseConnected,
+        },
+        { status: ok ? 200 : 500 }
+    );
 }

@@ -8,7 +8,14 @@ const isPublicRoute = createRouteMatcher([
   "/home",
 ]);
 
-const isPublicApiRoute = createRouteMatcher(["/api/videos"]);
+// API routes reachable without a Clerk session.
+// - /api/document-webhook: called by Cloudinary (verifies its own signature)
+// - /api/health: uptime checks (returns no secrets)
+const isPublicApiRoute = createRouteMatcher([
+  "/api/videos",
+  "/api/health",
+  "/api/document-webhook",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();

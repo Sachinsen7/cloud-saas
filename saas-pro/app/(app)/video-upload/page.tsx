@@ -4,6 +4,7 @@ import React from 'react';
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { MAX_VIDEO_SIZE_BYTES } from '@/lib/video';
 
 export default function Video() {
     const [file, setFile] = useState<File | null>(null);
@@ -15,7 +16,7 @@ export default function Video() {
 
     const router = useRouter();
 
-    const MAX_FILE_SIZE = 20 * 1024 * 1024;
+    const [progress, setProgress] = useState(0);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -23,23 +24,51 @@ export default function Video() {
             alert('Please select a file to upload.');
             return;
         }
-        if (file.size > MAX_FILE_SIZE) {
-            alert('File size exceeds 10MB. Please choose a smaller file.');
+        if (file.size > MAX_VIDEO_SIZE_BYTES) {
+            alert(
+                `File size exceeds ${MAX_VIDEO_SIZE_BYTES / 1024 / 1024}MB. Please choose a smaller file.`
+            );
             return;
         }
 
         setIsUploading(true);
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('originalSize', file.size.toString());
+        setProgress(0);
 
         try {
             setError(null);
             setSuccess(null);
-            const response = await axios.post('/api/video-upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+
+            // 1. Get a signature from our server.
+            const { data: sign } = await axios.post(
+                '/api/video-upload-signature'
+            );
+
+            // 2. Upload straight to Cloudinary (bypasses the server's body limit).
+            const cloudForm = new FormData();
+            cloudForm.append('file', file);
+            cloudForm.append('api_key', sign.apiKey);
+            cloudForm.append('timestamp', String(sign.timestamp));
+            cloudForm.append('signature', sign.signature);
+            cloudForm.append('folder', sign.folder);
+
+            const { data: uploaded } = await axios.post(
+                `https://api.cloudinary.com/v1_1/${sign.cloudName}/video/upload`,
+                cloudForm,
+                {
+                    onUploadProgress: (e) => {
+                        if (e.total) {
+                            setProgress(Math.round((e.loaded / e.total) * 100));
+                        }
+                    },
+                }
+            );
+
+            // 3. Save the record in our database.
+            const response = await axios.post('/api/video-upload', {
+                publicId: uploaded.public_id,
+                title,
+                description,
+                originalSize: file.size.toString(),
             });
             console.log('Video uploaded successfully:', response.data);
             setSuccess('Video uploaded successfully! Redirecting...');
@@ -48,10 +77,16 @@ export default function Video() {
             }, 1500);
         } catch (error: unknown) {
             console.error('Error uploading video:', error);
+            const data = (error as { response?: { data?: unknown } }).response
+                ?.data;
+            const cloudinaryMessage = (
+                data as { error?: { message?: string } } | undefined
+            )?.error?.message;
             setError(
-                (error as { response?: { data?: string }; message?: string }).response?.data ||
-                (error as { message?: string }).message ||
-                'Failed to upload video'
+                cloudinaryMessage ||
+                    (typeof data === 'string' && data) ||
+                    (error as { message?: string }).message ||
+                    'Failed to upload video'
             );
         } finally {
             setIsUploading(false);
@@ -140,7 +175,9 @@ export default function Video() {
                         className="btn btn-primary"
                         disabled={isUploading}
                     >
-                        {isUploading ? 'Uploading...' : 'Upload Video'}
+                        {isUploading
+                            ? `Uploading... ${progress}%`
+                            : 'Upload Video'}
                     </button>
                     <a href="/videos" className="btn btn-outline">
                         View All Videos

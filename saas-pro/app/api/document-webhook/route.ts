@@ -12,7 +12,25 @@ cloudinary.config({
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
+        // This route is public (Cloudinary can't log in via Clerk), so every
+        // call must carry a valid Cloudinary notification signature.
+        const rawBody = await request.text();
+        const signature = request.headers.get('x-cld-signature');
+        const timestamp = request.headers.get('x-cld-timestamp');
+
+        if (
+            !signature ||
+            !timestamp ||
+            !cloudinary.utils.verifyNotificationSignature(
+                rawBody,
+                Number(timestamp),
+                signature
+            )
+        ) {
+            return new NextResponse('Invalid signature', { status: 401 });
+        }
+
+        const body = JSON.parse(rawBody);
 
         if (body.notification_type === 'info' && body.info_kind === 'aspose') {
             const { public_id, info_status } = body;
