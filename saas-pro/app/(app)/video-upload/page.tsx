@@ -50,6 +50,7 @@ export default function Video() {
             cloudForm.append('timestamp', String(sign.timestamp));
             cloudForm.append('signature', sign.signature);
             cloudForm.append('folder', sign.folder);
+            cloudForm.append('transformation', sign.transformation);
 
             const { data: uploaded } = await axios.post(
                 `https://api.cloudinary.com/v1_1/${sign.cloudName}/video/upload`,
@@ -69,6 +70,7 @@ export default function Video() {
                 title,
                 description,
                 originalSize: file.size.toString(),
+                duration: uploaded.duration,
             });
             console.log('Video uploaded successfully:', response.data);
             setSuccess('Video uploaded successfully! Redirecting...');

@@ -14,7 +14,7 @@ cloudinary.config({
 
 // The browser uploads the video straight to Cloudinary (see
 // /api/video-upload-signature). This route only saves the record, and reads
-// size/duration from Cloudinary itself instead of trusting the client.
+// the stored (compressed) size from Cloudinary itself.
 export async function POST(request: NextRequest) {
     try {
         const { userId } = await auth();
@@ -33,12 +33,13 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        const { publicId, title, description, originalSize } =
+        const { publicId, title, description, originalSize, duration } =
             (await request.json()) as {
                 publicId?: string;
                 title?: string;
                 description?: string;
                 originalSize?: string;
+                duration?: number;
             };
 
         if (!title || title.trim() === '') {
@@ -62,7 +63,14 @@ export async function POST(request: NextRequest) {
                 publicId: resource.public_id,
                 originalSize: String(originalSize ?? resource.bytes),
                 compressedSize: String(resource.bytes),
-                duration: resource.duration || 0,
+                // Cloudinary's Admin API doesn't return duration for videos,
+                // so take it from the upload response the browser received.
+                duration:
+                    typeof duration === 'number' &&
+                    Number.isFinite(duration) &&
+                    duration >= 0
+                        ? duration
+                        : 0,
             },
         });
 

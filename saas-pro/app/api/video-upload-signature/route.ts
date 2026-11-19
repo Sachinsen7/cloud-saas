@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { VIDEO_FOLDER } from '@/lib/video';
+import { VIDEO_FOLDER, VIDEO_UPLOAD_TRANSFORMATION } from '@/lib/video';
 
 // Returns a short-lived signature so the browser can upload a video straight
 // to Cloudinary. This keeps the file out of the serverless function, which
@@ -23,7 +23,11 @@ export async function POST() {
     }
 
     const timestamp = Math.round(Date.now() / 1000);
-    const paramsToSign = { folder: VIDEO_FOLDER, timestamp };
+    const paramsToSign = {
+        folder: VIDEO_FOLDER,
+        timestamp,
+        transformation: VIDEO_UPLOAD_TRANSFORMATION,
+    };
     const signature = cloudinary.utils.api_sign_request(
         paramsToSign,
         apiSecret
@@ -35,5 +39,6 @@ export async function POST() {
         timestamp,
         signature,
         folder: VIDEO_FOLDER,
+        transformation: VIDEO_UPLOAD_TRANSFORMATION,
     });
 }
